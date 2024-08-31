@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head><meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -7,10 +6,6 @@
     <link rel="stylesheet" href="https://cjpnet.com.br/bootstrap/css/bootstrap.min.css">
     <script src="https://cjpnet.com.br/bootstrap/js/jquery.min.js"></script>
     <script src="https://cjpnet.com.br/bootstrap/js/bootstrap.min.js"></script>
-      <!-- Adicionando os CDNs -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
-    
     <style>	
     .pri-table thead tr th {
         background-color: #d3e0ea; /* Cor de fundo azul claro */
@@ -327,6 +322,24 @@
                         <td>1,00</td>
                         <td>51,60</td>
                         </tr></tbody></table><br>
+                        <!-- Modal para escolher o formato de download -->
+<div class="modal fade" id="formatoModal" tabindex="-1" aria-labelledby="formatoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="formatoModalLabel">Escolha o formato</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <button id="btn-excel" class="btn btn-outline-primary">Excel</button>
+          <button id="btn-pdf" class="btn btn-outline-primary">PDF</button>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+        </div>
+      </div>
+    </div>
+  </div>
 <button class="btn btn-outline-secondary" type="button" class="btn btn-info" onclick="history.back()">Voltar</button>
 <button class="float-right btn btn-outline-primary">Imprimir</button>
 <footer>
