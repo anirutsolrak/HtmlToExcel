@@ -3,7 +3,6 @@ import autoTable from 'jspdf-autotable';
 import { extractTableData, extractTableHeaders } from './utils.js';
 
 export function exportToPDF() {
-  const { jsPDF } = window.jspdf;
   const doc = new jsPDF({
     orientation: 'landscape'
   });
