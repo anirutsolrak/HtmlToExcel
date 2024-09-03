@@ -5,15 +5,15 @@ import * as pdf from './pdf.js';
 document.addEventListener('DOMContentLoaded', function () {
   const printButton = document.querySelector('.float-right.btn.btn-outline-primary');
 
-  $('#btn-fechar').click(function() {
-  $('#formatoModal').modal('hide');
-});
-
-
   printButton.addEventListener('click', function (event) {
     event.preventDefault();
     $('#formatoModal').modal('show');
   });
+
+  
+  $('#btn-fechar').click(function() {
+  $('#formatoModal').modal('hide');
+});
 
   $('#btn-excel').click(function () {
     excel.exportToExcel(); // Chama a função exportToExcel do arquivo excel.js
