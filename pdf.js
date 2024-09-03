@@ -15,7 +15,6 @@ export function exportToPDF() {
   doc.setFontSize(14);
   doc.text(subtitle, 10, 18);
 
-  // Adiciona as tabelas ao PDF usando autoTable
   addTablesToPDF(doc, startY);
 
   doc.save('RelatorioCompleto.pdf');
@@ -29,7 +28,7 @@ function addTablesToPDF(doc, startY) {
     const tableData = extractTableData(table);
     const tableHeaders = extractTableHeaders(table);
 
-    startY += 10;
+    startY += 10; 
 
     autoTable(doc, {
       head: [tableHeaders],
@@ -39,26 +38,25 @@ function addTablesToPDF(doc, startY) {
       didDrawPage: function (data) {
         if (data.pageNumber > 1) {
           doc.setFontSize(10);
-          doc.text("HOSPITAL REGIONAL DA COSTA LESTE MAGID THOMÉ", 10, 10);
-          doc.text("RL06 - CUSTO SERVIÇOS AUXILIARES", 10, 15);
+          doc.text("HOSPITAL REGIONAL DA COSTA LESTE MAGID THOMÉ", 10, startY - 20);
+          doc.text("RL06 - CUSTO SERVIÇOS AUXILIARES", 10, startY - 10); 
         }
       },
       didParseCell: function (data) {
-        if (data.cell.raw && data.cell.raw.includes('<strong>'))  {
+        if (data.cell.raw && data.cell.raw.includes('<strong>')) { 
           data.cell.styles.fontStyle = 'bold';
           data.cell.text = data.cell.raw.replace(/<strong>/g, '').replace(/<\/strong>/g, '');
         }
       }
     });
 
-    startY = doc.lastAutoTable.finalY;
+    startY = doc.lastAutoTable.finalY; 
   });
 
   doc.setFontSize(9);
   doc.setTextColor(0, 102, 0);
   doc.text("Sistemas integrados www.cjpnet.com.br", 10, doc.internal.pageSize.getHeight() - 10);
 
-  // Adiciona a numeração de páginas ao PDF
   const pageCount = doc.internal.getNumberOfPages();
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
