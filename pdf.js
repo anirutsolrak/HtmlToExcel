@@ -3,6 +3,7 @@ import autoTable from 'jspdf-autotable';
 import { extractTableData, extractTableHeaders } from './utils.js';
 
 export function exportToPDF() {
+  const { jsPDF } = window.jspdf;
   const doc = new jsPDF({
     orientation: 'landscape'
   });
@@ -10,39 +11,49 @@ export function exportToPDF() {
   const newLineHeightFactor = 0.5;
   doc.setLineHeightFactor(newLineHeightFactor);
 
+  // Obtém o título principal (h2) e o subtítulo (h3) diretamente do HTML
+  const mainTitle = document.querySelector('.col-sm-9 h2').textContent.trim();
+  const subtitle = document.querySelector('.col-sm-9 h3').textContent.trim();
+
   // Seleciona todas as tabelas que você quer incluir no PDF
   const tables = document.querySelectorAll('.table.table-responsive.table-striped.table-bordered.table-sm');
 
   let finalY = 30; // Posição inicial Y
 
- while (titleElement && (titleElement.tagName !== 'H3' && titleElement.tagName !== 'H2')) {
-      titleElement = titleElement.previousElementSibling;
-    }
+  // Carrega a imagem da logo
+  var logoImg = new Image();
+  logoImg.src = '/logo.png'; // Caminho da imagem na pasta public
 
-    // Define um título padrão se o título não for encontrado
-    let titleText = 'Tabela ' + (index + 1); // Título padrão
-    if (titleElement) {
-      titleText = titleElement.textContent.trim(); 
-    }
-
-    let titleHeight = doc.getTextDimensions(titleText).h;
+  tables.forEach((table, index) => {
+    // Adiciona o título da tabela ao PDF
+    let titleHeight = doc.getTextDimensions(mainTitle).h; 
     let titleX = doc.internal.pageSize.width / 2;
     let titleY = finalY + titleHeight + 5;
-    doc.setFontSize(10);
-    doc.text(titleText, titleX, titleY, {
-      align: 'center',
-    });
-    finalY = titleY; // Atualiza finalY para incluir a altura do título
-    }
+    doc.setFontSize(16);
+    doc.text(mainTitle, titleX, titleY, { align: 'center' });
+    doc.setFontSize(14);
+    doc.text(subtitle, titleX, titleY + 8, { align: 'center' });
 
-  doc.autoTable({
-  html: table,
-  startY: finalY + 10,
-  theme: 'grid',
-  headStyles: {
-    fillColor: [200, 230, 255], 
-    textColor: [0, 0, 0]
-  },
+    // Calcula a posição da logo à direita do título
+    const logoWidth = 30; 
+    const logoHeight = 10; 
+    const logoX = titleX + doc.getTextDimensions(mainTitle).w / 2 + 5;
+    const logoY = titleY - titleHeight / 2 - logoHeight / 2; 
+
+    // Adiciona a logo ao PDF
+    doc.addImage(logoImg, 'PNG', 150, 10, 50, 15);
+
+    finalY = titleY + 10; 
+
+    // Adiciona a tabela ao PDF
+    doc.autoTable({
+      html: table,
+      startY: finalY + 10,
+      theme: 'grid',
+      headStyles: {
+        fillColor: [200, 230, 255],
+        textColor: [0, 0, 0}
+      },
       bodyStyles: {
         fillColor: false
       },
