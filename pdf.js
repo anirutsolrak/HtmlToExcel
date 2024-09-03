@@ -105,20 +105,10 @@ export function exportToPDF() {
 
 function addDynamicTextAndPageNumbers(doc) {
   const pageCount = doc.internal.getNumberOfPages();
-  const dynamicTexts = [
-    document.querySelector('h2').textContent.trim() + " - Início do Projeto: " + document.querySelectorAll('.col-sm-3 p')[1]?.textContent,
-    document.querySelector('h3').textContent.trim() + " " + document.querySelector('.col-sm-6 p')?.textContent,
-  ];
 
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
     let yPos = 10;
-    dynamicTexts.forEach(text => {
-      doc.text(text, 155, yPos, {
-        align: 'center',
-        fontSize: 10
-      });
-      yPos += 7;
     });
 
     const pageWidth = doc.internal.pageSize.width;
