@@ -15,18 +15,24 @@ export function exportToPDF() {
 
   let finalY = 30; // Posição inicial Y
 
-  tables.forEach((table, index) => {
-    let titleElement = table.previousElementSibling; // Assume que o título é o elemento anterior à tabela
+ while (titleElement && (titleElement.tagName !== 'H3' && titleElement.tagName !== 'H2')) {
+      titleElement = titleElement.previousElementSibling;
+    }
 
+    // Define um título padrão se o título não for encontrado
+    let titleText = 'Tabela ' + (index + 1); // Título padrão
     if (titleElement) {
-      let titleHeight = doc.getTextDimensions(titleElement.textContent).h;
-      let titleX = doc.internal.pageSize.width / 2;
-      let titleY = finalY + titleHeight + 5;
-      doc.setFontSize(10);
-      doc.text(titleElement.textContent, titleX, titleY, {
-        align: 'center',
-      });
-      finalY = titleY; // Atualiza finalY para incluir a altura do título
+      titleText = titleElement.textContent.trim(); 
+    }
+
+    let titleHeight = doc.getTextDimensions(titleText).h;
+    let titleX = doc.internal.pageSize.width / 2;
+    let titleY = finalY + titleHeight + 5;
+    doc.setFontSize(10);
+    doc.text(titleText, titleX, titleY, {
+      align: 'center',
+    });
+    finalY = titleY; // Atualiza finalY para incluir a altura do título
     }
 
   doc.autoTable({
