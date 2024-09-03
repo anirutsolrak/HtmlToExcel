@@ -18,11 +18,6 @@ export function exportToPDF() {
   tables.forEach((table, index) => {
     let titleElement = table.previousElementSibling; // Assume que o título é o elemento anterior à tabela
 
-    // Verifica se o elemento anterior é um título (h2 ou h3)
-    while (titleElement && (titleElement.tagName !== 'H3' && titleElement.tagName !== 'H2')) {
-      titleElement = titleElement.previousElementSibling;
-    }
-
     if (titleElement) {
       let titleHeight = doc.getTextDimensions(titleElement.textContent).h;
       let titleX = doc.internal.pageSize.width / 2;
