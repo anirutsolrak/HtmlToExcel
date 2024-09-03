@@ -34,13 +34,14 @@ export function exportToPDF() {
       finalY = titleY; // Atualiza finalY para incluir a altura do título
     }
 
-    doc.autoTable({
-      html: table,
-      startY: finalY + 10,
-      theme: 'grid',
-      headStyles: {
-        fillColor: [0, 0, 0]
-      },
+  doc.autoTable({
+  html: table,
+  startY: finalY + 10,
+  theme: 'grid',
+  headStyles: {
+    fillColor: [200, 230, 255], 
+    textColor: [0, 0, 0]
+  },
       bodyStyles: {
         fillColor: false
       },
