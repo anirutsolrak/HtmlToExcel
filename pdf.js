@@ -22,7 +22,7 @@ export function exportToPDF() {
 
   // Carrega a imagem da logo
   var logoImg = new Image();
-  logoImg.src = '/logo.png'; // Caminho da imagem na pasta public
+  logoImg.src = './logo.png'; // Caminho da imagem na pasta public
 
   tables.forEach((table, index) => {
     // Adiciona o título da tabela ao PDF
@@ -52,7 +52,7 @@ export function exportToPDF() {
       theme: 'grid',
       headStyles: {
         fillColor: [200, 230, 255],
-        textColor: [0, 0, 0}
+        textColor: [0, 0, 0]
       },
       bodyStyles: {
         fillColor: false
