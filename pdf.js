@@ -39,7 +39,7 @@ export function exportToPDF() {
       startY: finalY + 10,
       theme: 'grid',
       headStyles: {
-        fillColor: [200, 230, 255]
+        fillColor: [0, 0, 0]
       },
       bodyStyles: {
         fillColor: false
