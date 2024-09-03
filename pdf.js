@@ -108,9 +108,6 @@ function addDynamicTextAndPageNumbers(doc) {
 
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
-    let yPos = 10;
-    });
-
     const pageWidth = doc.internal.pageSize.width;
     const pageHeight = doc.internal.pageSize.height;
     const str = 'Página ' + i + ' de ' + pageCount;
