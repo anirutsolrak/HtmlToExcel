@@ -10,7 +10,7 @@ botaoGerarPDF.addEventListener('click', () => {
 
 function gerarPDF() {
   // Acessando jsPDF e autoTable no escopo global (window)
-  const doc = new window.jspdf.jsPDF({
+  const doc = new window.jspdf({
     orientation: 'landscape',
   });
 
