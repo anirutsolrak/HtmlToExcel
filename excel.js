@@ -5,7 +5,7 @@ import { extractTableData, extractTableHeaders } from './utils.js';
 // Função para gerar o // excel.js
 
 // Função para gerar o arquivo Excel
-function exportToExcel() {
+export function exportToExcel() {
   const wb = XLSX.utils.book_new();
   const ws = XLSX.utils.aoa_to_sheet([]);
 
