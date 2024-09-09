@@ -20,9 +20,7 @@ function gerarPDF() {
     left: 10,
   };
 
-  const logoImg = 'data:image/png;base64,...'; // Insira o código base64 da imagem do logo aqui
-  const logoWidth = 30;
-  const logoHeight = 10;
+  doc.addImage('https://custos.sistema-egs.top/Autom/logo.png', 'PNG', logoX, logoY, logoWidth, logoHeight);
 
   // Capturar título dinamicamente
   const tituloPrincipal = document.querySelector('.col-sm-9 h2').textContent.trim();
