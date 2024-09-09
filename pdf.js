@@ -7,7 +7,7 @@ botaoGerarPDF.addEventListener('click', () => {
   gerarPDF();
 });
 
-function gerarPDF() {
+export function gerarPDF() {
   const doc = new jsPDF({
     orientation: 'landscape',
   });
