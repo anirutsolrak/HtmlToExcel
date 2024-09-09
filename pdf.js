@@ -303,3 +303,4 @@ function adicionarNumeracaoPaginas(doc) {
     });
   }
 }
+export { gerarPDF };
