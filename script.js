@@ -1,3 +1,7 @@
+import { exportToExcel } from './excel.js';
+import { gerarPDF } from './pdf.js';
+
+
 // script.js 
 document.addEventListener('DOMContentLoaded', function () {
   const printButton = document.querySelector('.float-right.btn.btn-outline-primary');
