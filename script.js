@@ -1,7 +1,4 @@
-import * as excel from './excel.js'; 
-import * as pdf from './pdf.js'; 
-
-// Aguarda o carregamento do DOM
+// script.js 
 document.addEventListener('DOMContentLoaded', function () {
   const printButton = document.querySelector('.float-right.btn.btn-outline-primary');
 
@@ -16,12 +13,12 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
   $('#btn-excel').click(function () {
-    excel.exportToExcel(); // Chama a função exportToExcel do arquivo excel.js
+    exportToExcel(); // Chama a função exportToExcel (agora no escopo global)
     $('#formatoModal').modal('hide');
   });
 
   $('#btn-pdf').click(function () {
-    pdf.exportToPDF(); // Chama a função exportToPDF do arquivo pdf.js
+    gerarPDF(); // Chama a função gerarPDF (agora no escopo global)
     $('#formatoModal').modal('hide');
   });
 });
