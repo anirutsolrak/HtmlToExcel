@@ -12,14 +12,14 @@ export function gerarPDF() {
 
   // Define as margens personalizadas
   doc.margins = {
-    top: 30,
+    top: 40, // Ajuste a margem superior se necessário
     right: 10,
     bottom: 10,
     left: 10,
   };
 
-  // Função para adicionar o cabeçalho em cada página
-  function adicionarCabecalho(doc) {
+  // Função para desenhar o cabeçalho
+  function desenharCabecalho(doc) {
     const logoWidth = 30;
     const logoHeight = 10;
 
@@ -49,14 +49,6 @@ export function gerarPDF() {
     doc.addImage(logoImg, 'PNG', logoX, logoY, logoWidth, logoHeight);
   }
 
-  // Adiciona a função de cabeçalho a cada nova página
-  doc.addPageContent((data) => {
-    adicionarCabecalho(doc);
-  });
-
-  // Define o espaçamento inicial da primeira tabela
-  let startY = 50; // Ajuste o valor se necessário
-
   // Obter todas as tabelas com a classe "pri-table"
   const tabelasPrincipais = document.querySelectorAll('.pri-table');
 
@@ -68,10 +60,89 @@ export function gerarPDF() {
     const dadosTabelaPrincipal = extrairDadosTabela(tabela);
 
     // Adicionar tabela principal ao PDF
-    adicionarTabelaAoPDF(doc, dadosTabelaPrincipal, tituloTabela, startY);
-
-    // Atualiza startY para a próxima tabela
-    startY = doc.lastAutoTable.finalY + 10;
+    autoTable(doc, {
+      head: [dadosTabelaPrincipal[0]],
+      body: dadosTabelaPrincipal.slice(1),
+      startY: doc.lastAutoTable.finalY || 45, // Começa abaixo do cabeçalho
+      theme: 'grid',
+      headStyles: {
+        fillColor: [200, 230, 255],
+        textColor: [0, 0, 0],
+      },
+      bodyStyles: {
+        fillColor: false,
+      },
+      alternateRowStyles: {
+        fillColor: false,
+      },
+      pageBreak: 'auto',
+      rowPageBreak: 'avoid', // Evita quebra de linha no meio de uma linha da tabela
+      overFlow: 'linebreak',
+      showHead: 'firstPage', // Mostra o cabeçalho da tabela apenas na primeira página
+      styles: {
+        fontSize: 7,
+        fontStyle: 'normal',
+        fontFamily: 'Calibri, sans-serif',
+      },
+      columnStyles: {
+        0: {
+          halign: 'left',
+        },
+        1: {
+          halign: 'center',
+        },
+        2: {
+          halign: 'center',
+        },
+        3: {
+          halign: 'center',
+        },
+        4: {
+          halign: 'center',
+        },
+        5: {
+          halign: 'center',
+        },
+        6: {
+          halign: 'center',
+        },
+        7: {
+          halign: 'center',
+        },
+        8: {
+          halign: 'center',
+        },
+        9: {
+          halign: 'center',
+        },
+        10: {
+          halign: 'center',
+        },
+        11: {
+          halign: 'center',
+        },
+        12: {
+          halign: 'center',
+        },
+        13: {
+          halign: 'center',
+        },
+      },
+      didParseCell: function (data) {
+        if (data.row.index === 0 && data.section === 'body') {
+          data.cell.styles.fillColor = [200, 230, 255];
+          data.cell.styles.textColor = [0, 0, 0];
+        }
+        if (data.cell.raw && data.cell.raw.includes('<strong>')) {
+          data.cell.styles.fontStyle = 'bold';
+          data.cell.text = data.cell.raw.replace(/<strong>/g, '').replace(/<\/strong>/g, '');
+        }
+      },
+      // Função chamada após desenhar cada página da tabela
+      didDrawPage: (data) => {
+        desenharCabecalho(doc);
+      },
+    });
 
     // Verificar se há uma tabela de detalhes relacionada
     const tabelaDetalhes = tabela.nextElementSibling.classList.contains('det-table')
@@ -80,14 +151,52 @@ export function gerarPDF() {
 
     if (tabelaDetalhes) {
       const dadosTabelaDetalhes = extrairDadosTabela(tabelaDetalhes);
-      adicionarTabelaAoPDF(doc, dadosTabelaDetalhes, 'Detalhes', startY);
-
-      // Atualiza startY após a tabela de detalhes
-      startY = doc.lastAutoTable.finalY + 10;
+      // Adicionar tabela de detalhes ao PDF (mantendo a lógica do cabeçalho)
+      autoTable(doc, {
+        head: [dadosTabelaDetalhes[0]],
+        body: dadosTabelaDetalhes.slice(1),
+        startY: doc.lastAutoTable.finalY + 5, // Começa abaixo da tabela anterior
+        theme: 'grid',
+        headStyles: {
+          fillColor: [200, 230, 255],
+          textColor: [0, 0, 0],
+        },
+        bodyStyles: {
+          fillColor: false,
+        },
+        alternateRowStyles: {
+          fillColor: false,
+        },
+        pageBreak: 'auto',
+        rowPageBreak: 'avoid', // Evita quebra de linha no meio de uma linha da tabela
+        overFlow: 'linebreak',
+        showHead: 'firstPage', // Mostra o cabeçalho da tabela apenas na primeira página
+        styles: {
+          fontSize: 7,
+          fontStyle: 'normal',
+          fontFamily: 'Calibri, sans-serif',
+        },
+        columnStyles: {
+          // ... suas configurações de columnStyles ...
+        },
+        didParseCell: function (data) {
+          if (data.row.index === 0 && data.section === 'body') {
+            data.cell.styles.fillColor = [200, 230, 255];
+            data.cell.styles.textColor = [0, 0, 0];
+          }
+          if (data.cell.raw && data.cell.raw.includes('<strong>')) {
+            data.cell.styles.fontStyle = 'bold';
+            data.cell.text = data.cell.raw.replace(/<strong>/g, '').replace(/<\/strong>/g, '');
+          }
+        },
+        didDrawPage: (data) => {
+          desenharCabecalho(doc);
+        },
+      });
     }
   });
 
-  // Adiciona o rodapé e a numeração de páginas
+  // Adiciona o rodapé e a numeração de páginas (se necessário)
   adicionarNumeracaoPaginas(doc);
 
   doc.save(`${tituloPrincipal}_${subtitulo}.pdf`);
@@ -112,95 +221,6 @@ function extrairDadosTabela(tabela) {
   });
 
   return dados;
-}
-
-function adicionarTabelaAoPDF(doc, dadosTabela, titulo, startY) {
-  const titleHeight = doc.getTextDimensions(titulo).h;
-
-  doc.setFontSize(10);
-  doc.text(titulo, doc.internal.pageSize.width / 2, startY + titleHeight - 5, {
-    align: 'center',
-  });
-
-  autoTable(doc, {
-    head: [dadosTabela[0]],
-    body: dadosTabela.slice(1),
-    startY: startY + titleHeight + 5,
-    theme: 'grid',
-    headStyles: {
-      fillColor: [200, 230, 255],
-      textColor: [0, 0, 0],
-    },
-    bodyStyles: {
-      fillColor: false,
-    },
-    alternateRowStyles: {
-      fillColor: false,
-    },
-    pageBreak: 'auto',
-    rowPageBreak: 'noWrap',
-    overFlow: 'linebreak',
-    showHead: 'everyPage',
-    styles: {
-      fontSize: 7,
-      fontStyle: 'normal',
-      fontFamily: 'Calibri, sans-serif',
-    },
-    columnStyles: {
-      0: {
-        halign: 'left',
-      },
-      1: {
-        halign: 'center',
-      },
-      2: {
-        halign: 'center',
-      },
-      3: {
-        halign: 'center',
-      },
-      4: {
-        halign: 'center',
-      },
-      5: {
-        halign: 'center',
-      },
-      6: {
-        halign: 'center',
-      },
-      7: {
-        halign: 'center',
-      },
-      8: {
-        halign: 'center',
-      },
-      9: {
-        halign: 'center',
-      },
-      10: {
-        halign: 'center',
-      },
-      11: {
-        halign: 'center',
-      },
-      12: {
-        halign: 'center',
-      },
-      13: {
-        halign: 'center',
-      },
-    },
-    didParseCell: function (data) {
-      if (data.row.index === 0 && data.section === 'body') {
-        data.cell.styles.fillColor = [200, 230, 255];
-        data.cell.styles.textColor = [0, 0, 0];
-      }
-      if (data.cell.raw && data.cell.raw.includes('<strong>')) {
-        data.cell.styles.fontStyle = 'bold';
-        data.cell.text = data.cell.raw.replace(/<strong>/g, '').replace(/<\/strong>/g, '');
-      }
-    },
-  });
 }
 
 function adicionarNumeracaoPaginas(doc) {
