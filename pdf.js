@@ -18,38 +18,44 @@ export function gerarPDF() {
     left: 10,
   };
 
-  const logoWidth = 30;
-  const logoHeight = 10;
+  // Função para adicionar o cabeçalho em cada página
+  function adicionarCabecalho(doc) {
+    const logoWidth = 30;
+    const logoHeight = 10;
 
-  // Capturar título dinamicamente
-  const tituloPrincipal = document.querySelector('.col-sm-9 h2').textContent.trim();
-  const subtitulo = document.querySelector('.col-sm-9 h3').textContent.trim();
+    // Capturar título dinamicamente
+    const tituloPrincipal = document.querySelector('.col-sm-9 h2').textContent.trim();
+    const subtitulo = document.querySelector('.col-sm-9 h3').textContent.trim();
 
-  // Calcula a altura do título principal
-  const maxTitleWidth = 350;
-  let titleHeight = doc.getTextDimensions(tituloPrincipal, { maxWidth: maxTitleWidth }).h;
+    // Calcula a altura do título principal
+    const maxTitleWidth = 350;
+    let titleHeight = doc.getTextDimensions(tituloPrincipal, { maxWidth: maxTitleWidth }).h;
 
-  // Posição X do título principal (centralizado com ajuste para a logo)
-  let titleX = (doc.internal.pageSize.getWidth() - logoWidth) / 2 - 5;
+    // Posição X do título principal (centralizado com ajuste para a logo)
+    let titleX = (doc.internal.pageSize.getWidth() - logoWidth) / 2 - 5;
 
-  // Posição Y do título (com margem superior)
-  let titleY = 20 + titleHeight;
+    // Posição Y do título (com margem superior)
+    let titleY = 20 + titleHeight;
 
-  // Posição da logo (à direita do título)
-  const logoX = titleX + doc.getTextDimensions(tituloPrincipal, { maxWidth: maxTitleWidth }).w / 2 + 10;
-  const logoY = titleY - titleHeight / 2 - logoHeight / 2;
+    // Posição da logo (à direita do título)
+    const logoX = titleX + doc.getTextDimensions(tituloPrincipal, { maxWidth: maxTitleWidth }).w / 2 + 10;
+    const logoY = titleY - titleHeight / 2 - logoHeight / 2;
 
-  // Adiciona a imagem do logo usando base64
-  doc.addImage(logoImg, 'PNG', logoX, logoY, logoWidth, logoHeight); 
+    // Renderiza o título, subtítulo e logo
+    doc.setFontSize(16);
+    doc.text(tituloPrincipal, titleX, titleY, { align: 'center', maxWidth: maxTitleWidth });
+    doc.setFontSize(14);
+    doc.text(subtitulo, titleX, titleY + 8, { align: 'center' });
+    doc.addImage(logoImg, 'PNG', logoX, logoY, logoWidth, logoHeight);
+  }
 
-  // Renderiza o título e subtítulo
-  doc.setFontSize(16);
-  doc.text(tituloPrincipal, titleX, titleY, { align: 'center', maxWidth: maxTitleWidth });
-  doc.setFontSize(14);
-  doc.text(subtitulo, titleX, titleY + 8, { align: 'center' });
+  // Adiciona a função de cabeçalho a cada nova página
+  doc.addPageContent((data) => {
+    adicionarCabecalho(doc);
+  });
 
   // Define o espaçamento inicial da primeira tabela
-  let startY = titleY + 30;
+  let startY = 50; // Ajuste o valor se necessário
 
   // Obter todas as tabelas com a classe "pri-table"
   const tabelasPrincipais = document.querySelectorAll('.pri-table');
@@ -86,7 +92,6 @@ export function gerarPDF() {
 
   doc.save(`${tituloPrincipal}_${subtitulo}.pdf`);
 }
-
 
 function extrairDadosTabela(tabela) {
   const dados = [];
