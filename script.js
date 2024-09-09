@@ -1,8 +1,6 @@
-import { exportToExcel } from './excel.js';
-import { gerarPDF } from './pdf.js';
+import { exportToExcel } from './excel.js'; 
+import { gerarPDF } from './pdf.js'; 
 
-
-// script.js 
 document.addEventListener('DOMContentLoaded', function () {
   const printButton = document.querySelector('.float-right.btn.btn-outline-primary');
 
@@ -11,18 +9,17 @@ document.addEventListener('DOMContentLoaded', function () {
     $('#formatoModal').modal('show');
   });
 
-  
   $('#btn-fechar').click(function() {
-  $('#formatoModal').modal('hide');
-});
+    $('#formatoModal').modal('hide');
+  });
 
   $('#btn-excel').click(function () {
-    exportToExcel(); // Chama a função exportToExcel (agora no escopo global)
+    exportToExcel(); 
     $('#formatoModal').modal('hide');
   });
 
   $('#btn-pdf').click(function () {
-    gerarPDF(); // Chama a função gerarPDF (agora no escopo global)
+    gerarPDF(); 
     $('#formatoModal').modal('hide');
   });
 });
