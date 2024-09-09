@@ -1,11 +1,5 @@
-// pdf.js
-
-// Certifique-se de que o botão "PDF" dentro do modal tenha um ID
-const botaoGerarPDF = document.getElementById('btn-pdf'); 
-
-botaoGerarPDF.addEventListener('click', () => {
-  gerarPDF();
-});
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 export function gerarPDF() {
   const doc = new jsPDF({
@@ -20,7 +14,8 @@ export function gerarPDF() {
     left: 10,
   };
 
-  doc.addImage('https://custos.sistema-egs.top/Autom/logo.png', 'PNG', logoX, logoY, logoWidth, logoHeight);
+  const logoWidth = 30;
+  const logoHeight = 10;
 
   // Capturar título dinamicamente
   const tituloPrincipal = document.querySelector('.col-sm-9 h2').textContent.trim();
@@ -40,20 +35,21 @@ export function gerarPDF() {
   const logoX = titleX + doc.getTextDimensions(tituloPrincipal, { maxWidth: maxTitleWidth }).w / 2 + 10;
   const logoY = titleY - titleHeight / 2 - logoHeight / 2;
 
-  // Renderiza o título, subtítulo e logo
+  doc.addImage('https://custos.sistema-egs.top/Autom/logo.png', 'PNG', logoX, logoY, logoWidth, logoHeight);
+
+  // Renderiza o título e subtítulo
   doc.setFontSize(16);
   doc.text(tituloPrincipal, titleX, titleY, { align: 'center', maxWidth: maxTitleWidth });
   doc.setFontSize(14);
   doc.text(subtitulo, titleX, titleY + 8, { align: 'center' });
-  doc.addImage(logoImg, 'PNG', logoX, logoY, logoWidth, logoHeight);
 
   // Define o espaçamento inicial da primeira tabela
-  let startY = titleY + 30; 
+  let startY = titleY + 30;
 
   // Obter todas as tabelas com a classe "pri-table"
   const tabelasPrincipais = document.querySelectorAll('.pri-table');
 
-  tabelasPrincipais.forEach((tabela, index) => {
+  tabelasPrincipais.forEach((tabela) => {
     // Obter o título da tabela
     const tituloTabela = tabela.previousElementSibling.textContent.trim();
 
@@ -63,7 +59,7 @@ export function gerarPDF() {
     // Adicionar tabela principal ao PDF
     adicionarTabelaAoPDF(doc, dadosTabelaPrincipal, tituloTabela, startY);
 
-    // Atualiza startY para a próxima tabela 
+    // Atualiza startY para a próxima tabela
     startY = doc.lastAutoTable.finalY + 10;
 
     // Verificar se há uma tabela de detalhes relacionada
@@ -86,23 +82,20 @@ export function gerarPDF() {
   doc.save(`${tituloPrincipal}_${subtitulo}.pdf`);
 }
 
-// Função para extrair dados de uma tabela HTML
 function extrairDadosTabela(tabela) {
   const dados = [];
   const cabecalho = [];
   const linhas = tabela.querySelectorAll('tbody tr');
 
-  // Extrair dados do cabeçalho
-  tabela.querySelectorAll('thead th').forEach(th => {
-    cabecalho.push(th.textContent.trim()); 
+  tabela.querySelectorAll('thead th').forEach((th) => {
+    cabecalho.push(th.textContent.trim());
   });
-  dados.push(cabecalho); 
+  dados.push(cabecalho);
 
-  // Extrair dados das linhas
-  linhas.forEach(linha => {
+  linhas.forEach((linha) => {
     const linhaDados = [];
-    linha.querySelectorAll('td').forEach(td => {
-      linhaDados.push(td.textContent.trim()); 
+    linha.querySelectorAll('td').forEach((td) => {
+      linhaDados.push(td.textContent.trim());
     });
     dados.push(linhaDados);
   });
@@ -110,22 +103,15 @@ function extrairDadosTabela(tabela) {
   return dados;
 }
 
-function adicionarCabecalho(doc, tituloPrincipal, subtitulo) {
-  let yPos = 10;
-  doc.text(tituloPrincipal, doc.internal.pageSize.width / 2, yPos, { align: 'center', fontSize: 10 });
-  yPos += 7;
-  doc.text(subtitulo, doc.internal.pageSize.width / 2, yPos, { align: 'center', fontSize: 10 });
-}
-
 function adicionarTabelaAoPDF(doc, dadosTabela, titulo, startY) {
   const titleHeight = doc.getTextDimensions(titulo).h;
 
   doc.setFontSize(10);
   doc.text(titulo, doc.internal.pageSize.width / 2, startY + titleHeight - 5, {
-    align: 'center'
+    align: 'center',
   });
 
-  doc.autoTable({
+  autoTable(doc, {
     head: [dadosTabela[0]],
     body: dadosTabela.slice(1),
     startY: startY + titleHeight + 5,
@@ -154,44 +140,44 @@ function adicionarTabelaAoPDF(doc, dadosTabela, titulo, startY) {
         halign: 'left',
       },
       1: {
-        halign: 'center'
+        halign: 'center',
       },
       2: {
-        halign: 'center'
+        halign: 'center',
       },
       3: {
-        halign: 'center'
+        halign: 'center',
       },
       4: {
-        halign: 'center'
+        halign: 'center',
       },
       5: {
-        halign: 'center'
+        halign: 'center',
       },
       6: {
-        halign: 'center'
+        halign: 'center',
       },
       7: {
-        halign: 'center'
+        halign: 'center',
       },
       8: {
-        halign: 'center'
+        halign: 'center',
       },
       9: {
-        halign: 'center'
+        halign: 'center',
       },
       10: {
-        halign: 'center'
+        halign: 'center',
       },
       11: {
-        halign: 'center'
+        halign: 'center',
       },
       12: {
-        halign: 'center'
+        halign: 'center',
       },
       13: {
-        halign: 'center'
-      }
+        halign: 'center',
+      },
     },
     didParseCell: function (data) {
       if (data.row.index === 0 && data.section === 'body') {
@@ -202,7 +188,7 @@ function adicionarTabelaAoPDF(doc, dadosTabela, titulo, startY) {
         data.cell.styles.fontStyle = 'bold';
         data.cell.text = data.cell.raw.replace(/<strong>/g, '').replace(/<\/strong>/g, '');
       }
-    }
+    },
   });
 }
 
@@ -216,7 +202,7 @@ function adicionarNumeracaoPaginas(doc) {
     const str = 'Página ' + i + ' de ' + pageCount;
     doc.setFontSize(6);
     doc.text(str, pageWidth - 10, pageHeight - 3, {
-      align: 'right'
+      align: 'right',
     });
   }
 }
