@@ -32,7 +32,7 @@ function gerarPDF() {
   let titleX = (doc.internal.pageSize.getWidth() - logoWidth) / 2 - 5;
 
   // Posição Y do título (com margem superior)
-  let titleY = 20 + titleHeight;
+  let titleY = 25 + titleHeight;
 
   // Posição da logo (à direita do título)
   const logoX = titleX + doc.getTextDimensions(tituloPrincipal, { maxWidth: maxTitleWidth }).w / 2 + 10;
