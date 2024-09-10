@@ -99,7 +99,7 @@ function gerarPDF() {
       startY = adicionarTabelaAoPDF(doc, tabela.detalhes.dados, tabela.detalhes.titulo, startY);
     }
   });
-
+  adicionarNumeracaoPaginas(doc);
   // Salvar o PDF apenas uma vez, após adicionar todas as tabelas
   doc.save(`${tituloPrincipal}_${subtitulo}.pdf`);
 }
