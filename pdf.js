@@ -206,7 +206,7 @@ function adicionarTabelaAoPDF(doc, dadosTabela, titulo, startY) {
     },
     didParseCell: function (data) {
       if (data.row.index === 0 && data.section === 'body') {
-        data.cell.styles.fillColor = [200, 230, 255];
+        // caso queira que a primira linha de cada tabela tenha uma cor diferente basta usar cores hexadecimais aqui e descomentar essa linha data.cell.styles.fillColor = [200, 230, 255];
         data.cell.styles.textColor = [0, 0, 0];
       }
       if (data.cell.raw && data.cell.raw.includes('<strong>')) {
