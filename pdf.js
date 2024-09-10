@@ -51,21 +51,26 @@ function gerarPDF() {
   doc.text(subtitulo, titleX, titleY + 8, { align: 'center' });
   doc.addImage(logoImg, 'PNG', logoX, logoY, logoWidth, logoHeight);
 
-  // Define o espaçamento inicial da primeira tabela
-  let startY = titleY + 30;
+  // Estrutura para armazenar os dados das tabelas
+  const dadosTabelas = [];
 
   // Obter todas as tabelas com a classe "pri-table"
   const tabelasPrincipais = document.querySelectorAll('.pri-table');
 
-  tabelasPrincipais.forEach((tabela, index) => {
-    // Obter o título da tabela
-    const tituloTabela = tabela.previousElementSibling.textContent.trim();
+  // Iterar pelas tabelas principais para coletar os dados
+  tabelasPrincipais.forEach((tabela) => {
+    // Obter o título da tabela principal
+    const tituloTabelaPrincipal = tabela.previousElementSibling.textContent.trim();
 
     // Extrair dados da tabela principal
     const dadosTabelaPrincipal = extrairDadosTabela(tabela);
 
-    // Adicionar tabela principal ao PDF
-    startY = adicionarTabelaAoPDF(doc, dadosTabelaPrincipal, tituloTabela, startY);
+    // Criar um objeto para armazenar os dados da tabela principal e seus detalhes
+    const dadosTabela = {
+      titulo: tituloTabelaPrincipal,
+      dados: dadosTabelaPrincipal,
+      detalhes: null, // Inicialmente, não há detalhes
+    };
 
     // Verificar se há uma tabela de detalhes relacionada
     const tabelaDetalhes = tabela.nextElementSibling.classList.contains('det-table')
@@ -73,8 +78,31 @@ function gerarPDF() {
       : null;
 
     if (tabelaDetalhes) {
+      // Extrair dados da tabela de detalhes
       const dadosTabelaDetalhes = extrairDadosTabela(tabelaDetalhes);
-      startY = adicionarTabelaAoPDF(doc, dadosTabelaDetalhes, 'Detalhes', startY);
+
+      // Adicionar os dados da tabela de detalhes ao objeto da tabela principal
+      dadosTabela.detalhes = {
+        titulo: 'Detalhes',
+        dados: dadosTabelaDetalhes,
+      };
+    }
+
+    // Adicionar o objeto da tabela (principal + detalhes) ao array
+    dadosTabelas.push(dadosTabela);
+  });
+
+  // Posição vertical inicial
+  let startY = titleY + 30;
+
+  // Iterar sobre a estrutura de dados das tabelas para construir o PDF
+  dadosTabelas.forEach((tabela) => {
+    // Adicionar a tabela principal ao PDF
+    startY = adicionarTabelaAoPDF(doc, tabela.dados, tabela.titulo, startY);
+
+    // Se houver detalhes, adicioná-los também
+    if (tabela.detalhes) {
+      startY = adicionarTabelaAoPDF(doc, tabela.detalhes.dados, tabela.detalhes.titulo, startY);
     }
   });
 
