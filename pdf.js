@@ -106,9 +106,7 @@ function gerarPDF() {
     }
   });
 
-  // Adiciona o rodapé e a numeração de páginas
-  adicionarNumeracaoPaginas(doc);
-
+  // Salvar o PDF apenas uma vez, após adicionar todas as tabelas
   doc.save(`${tituloPrincipal}_${subtitulo}.pdf`);
 }
 
