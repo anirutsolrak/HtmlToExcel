@@ -1,5 +1,20 @@
 // pdf.js
 
+function adicionarNumeracaoPaginas(doc) {
+  const pageCount = doc.autoTable.previous.pageCount;
+
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    const pageWidth = doc.internal.pageSize.width;
+    const pageHeight = doc.internal.pageSize.height;
+    const str = 'Página ' + i + ' de ' + pageCount;
+    doc.setFontSize(8);
+    doc.text(str, pageWidth - 10, pageHeight - 5, {
+      align: 'right'
+    });
+  }
+}
+
 function gerarPDF() {
   // Acessando jsPDF no escopo global (window)
   const { jsPDF } = window.jspdf;
@@ -99,7 +114,7 @@ function gerarPDF() {
       startY = adicionarTabelaAoPDF(doc, tabela.detalhes.dados, tabela.detalhes.titulo, startY);
     }
   });
-
+adicionarNumeracaoPaginas(doc);
   // Salvar o PDF apenas uma vez, após adicionar todas as tabelas
   doc.save(`${tituloPrincipal}_${subtitulo}.pdf`);
 }
@@ -218,21 +233,6 @@ function adicionarTabelaAoPDF(doc, dadosTabela, titulo, startY) {
 
   // Retorna a nova posição Y após adicionar a tabela
   return doc.lastAutoTable.finalY + 10;
-}
-
-function adicionarNumeracaoPaginas(doc) {
-  const pageCount = doc.autoTable.previous.pageCount;
-
-  for (let i = 1; i <= pageCount; i++) {
-    doc.setPage(i);
-    const pageWidth = doc.internal.pageSize.width;
-    const pageHeight = doc.internal.pageSize.height;
-    const str = 'Página ' + i + ' de ' + pageCount;
-    doc.setFontSize(8);
-    doc.text(str, pageWidth - 10, pageHeight - 5, {
-      align: 'right'
-    });
-  }
 }
 
 export { gerarPDF };
