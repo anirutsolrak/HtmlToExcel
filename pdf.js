@@ -2,12 +2,10 @@
 
 function adicionarNumeracaoPaginas(doc) {
   const pageCount = doc.autoTable.previous.pageCount;
+  doc.addPageContent(function(data)
+                     { let paginaAtual = data.pageCount = data.pageCount;
+                      let str = `Página ${paginaAtual}/${totalPaginas}`;
 
-  for (let i = 1; i <= pageCount; i++) {
-    doc.setPage(i);
-    const pageWidth = doc.internal.pageSize.width;
-    const pageHeight = doc.internal.pageSize.height;
-    const str = 'Página ' + i + ' de ' + pageCount;
     doc.setFontSize(8);
     doc.text(str, pageWidth - 10, pageHeight - 5, {
       align: 'right'
