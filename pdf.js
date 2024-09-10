@@ -1,17 +1,6 @@
 // pdf.js
 
-function adicionarNumeracaoPaginas(doc) {
-  const pageCount = doc.autoTable.previous.pageCount;
-  doc.addPageContent(function(data)
-                     { let paginaAtual = data.pageCount = data.pageCount;
-                      let str = `Página ${paginaAtual}/${totalPaginas}`;
-
-    doc.setFontSize(8);
-    doc.text(str, pageWidth - 10, pageHeight - 5, {
-      align: 'right'
-    });
-  }
-}
+// pdf.js
 
 function gerarPDF() {
   // Acessando jsPDF no escopo global (window)
@@ -112,7 +101,10 @@ function gerarPDF() {
       startY = adicionarTabelaAoPDF(doc, tabela.detalhes.dados, tabela.detalhes.titulo, startY);
     }
   });
-adicionarNumeracaoPaginas(doc);
+
+  // Adiciona a numeração de páginas
+  adicionarNumeracaoPaginas(doc);
+
   // Salvar o PDF apenas uma vez, após adicionar todas as tabelas
   doc.save(`${tituloPrincipal}_${subtitulo}.pdf`);
 }
@@ -219,7 +211,8 @@ function adicionarTabelaAoPDF(doc, dadosTabela, titulo, startY) {
     },
     didParseCell: function (data) {
       if (data.row.index === 0 && data.section === 'body') {
-        // caso queira que a primira linha de cada tabela tenha uma cor diferente basta usar cores hexadecimais aqui e descomentar essa linha data.cell.styles.fillColor = [200, 230, 255];
+        // caso queira que a primira linha de cada tabela tenha uma cor diferente basta usar cores hexadecimais aqui e descomentar essa linha 
+        // data.cell.styles.fillColor = [200, 230, 255];
         data.cell.styles.textColor = [0, 0, 0];
       }
       if (data.cell.raw && data.cell.raw.includes('<strong>')) {
@@ -231,6 +224,31 @@ function adicionarTabelaAoPDF(doc, dadosTabela, titulo, startY) {
 
   // Retorna a nova posição Y após adicionar a tabela
   return doc.lastAutoTable.finalY + 10;
+}
+
+
+function adicionarNumeracaoPaginas(doc) {
+  // Obtém o número total de páginas
+  const totalPaginas = doc.autoTable.previous.pageCount;
+
+  // Função interna para adicionar a numeração em cada página
+  doc.addPageContent(function(data) {
+    // Obtém o número da página atual
+    let paginaAtual = data.pageCount;
+
+    // Define a string de numeração
+    let str = `Página ${paginaAtual}/${totalPaginas}`;
+
+    // Obtém a largura e altura da página a partir do objeto data
+    const pageWidth = data.settings.pageWidth;
+    const pageHeight = data.settings.pageHeight;
+
+    // Adiciona a numeração ao PDF
+    doc.setFontSize(8);
+    doc.text(str, pageWidth - 10, pageHeight - 5, {
+      align: 'right'
+    });
+  });
 }
 
 export { gerarPDF };
