@@ -1,11 +1,5 @@
 // pdf.js
 
-// Certifique-se de que o botão "PDF" dentro do modal tenha um ID
-const botaoGerarPDF = document.getElementById('btn-pdf');
-botaoGerarPDF.addEventListener('click', () => {
-  gerarPDF();
-});
-
 function gerarPDF() {
   // Acessando jsPDF no escopo global (window)
   const { jsPDF } = window.jspdf;
