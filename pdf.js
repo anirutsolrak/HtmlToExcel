@@ -13,7 +13,7 @@ function gerarPDF() {
     orientation: 'landscape',
   });
 
- // Define as margens personalizadas
+  // Define as margens personalizadas
   doc.margins = {
     top: 30,
     right: 10,
@@ -52,7 +52,7 @@ function gerarPDF() {
   doc.addImage(logoImg, 'PNG', logoX, logoY, logoWidth, logoHeight);
 
   // Define o espaçamento inicial da primeira tabela
-  let startY = titleY + 30; 
+  let startY = titleY + 30;
 
   // Obter todas as tabelas com a classe "pri-table"
   const tabelasPrincipais = document.querySelectorAll('.pri-table');
@@ -65,10 +65,7 @@ function gerarPDF() {
     const dadosTabelaPrincipal = extrairDadosTabela(tabela);
 
     // Adicionar tabela principal ao PDF
-    adicionarTabelaAoPDF(doc, dadosTabelaPrincipal, tituloTabela, startY);
-
-    // Atualiza startY para a próxima tabela 
-    startY = doc.lastAutoTable.finalY + 10;
+    startY = adicionarTabelaAoPDF(doc, dadosTabelaPrincipal, tituloTabela, startY);
 
     // Verificar se há uma tabela de detalhes relacionada
     const tabelaDetalhes = tabela.nextElementSibling.classList.contains('det-table')
@@ -77,10 +74,7 @@ function gerarPDF() {
 
     if (tabelaDetalhes) {
       const dadosTabelaDetalhes = extrairDadosTabela(tabelaDetalhes);
-      adicionarTabelaAoPDF(doc, dadosTabelaDetalhes, 'Detalhes', startY);
-
-      // Atualiza startY após a tabela de detalhes
-      startY = doc.lastAutoTable.finalY + 10;
+      startY = adicionarTabelaAoPDF(doc, dadosTabelaDetalhes, 'Detalhes', startY);
     }
   });
 
@@ -112,13 +106,6 @@ function extrairDadosTabela(tabela) {
   });
 
   return dados;
-}
-
-function adicionarCabecalho(doc, tituloPrincipal, subtitulo) {
-  let yPos = 10;
-  doc.text(tituloPrincipal, doc.internal.pageSize.width / 2, yPos, { align: 'center', fontSize: 10 });
-  yPos += 7;
-  doc.text(subtitulo, doc.internal.pageSize.width / 2, yPos, { align: 'center', fontSize: 10 });
 }
 
 function adicionarTabelaAoPDF(doc, dadosTabela, titulo, startY) {
@@ -208,6 +195,9 @@ function adicionarTabelaAoPDF(doc, dadosTabela, titulo, startY) {
       }
     }
   });
+
+  // Retorna a nova posição Y após adicionar a tabela
+  return doc.lastAutoTable.finalY + 10;
 }
 
 function adicionarNumeracaoPaginas(doc) {
@@ -224,4 +214,5 @@ function adicionarNumeracaoPaginas(doc) {
     });
   }
 }
+
 export { gerarPDF };
