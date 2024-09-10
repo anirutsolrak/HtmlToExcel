@@ -87,7 +87,7 @@ function gerarPDF() {
   });
 
   // Posição vertical inicial
-  let startY = titleY + 30;
+  let startY = titleY + 20;
 
   // Iterar sobre a estrutura de dados das tabelas para construir o PDF
   dadosTabelas.forEach((tabela) => {
