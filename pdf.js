@@ -1,7 +1,7 @@
 // pdf.js
 
 // Certifique-se de que o botão "PDF" dentro do modal tenha um ID
-const botaoGerarPDF = document.getElementById('btn-pdf'); 
+const botaoGerarPDF = document.getElementById('btn-pdf');
 botaoGerarPDF.addEventListener('click', () => {
   gerarPDF();
 });
@@ -51,24 +51,24 @@ function gerarPDF() {
   doc.text(subtitulo, titleX, titleY + 8, { align: 'center' });
   doc.addImage(logoImg, 'PNG', logoX, logoY, logoWidth, logoHeight);
 
-  // Define o espaçamento inicial da primeira tabela
-  let startY = titleY + 30;
+  // Array para armazenar os dados de todas as tabelas
+  const dadosTodasTabelas = [];
 
   // Obter todas as tabelas com a classe "pri-table"
   const tabelasPrincipais = document.querySelectorAll('.pri-table');
 
-  tabelasPrincipais.forEach((tabela, index) => {
+  tabelasPrincipais.forEach((tabela) => {
     // Obter o título da tabela
     const tituloTabela = tabela.previousElementSibling.textContent.trim();
 
     // Extrair dados da tabela principal
     const dadosTabelaPrincipal = extrairDadosTabela(tabela);
 
-    // Adicionar tabela principal ao PDF
-    adicionarTabelaAoPDF(doc, dadosTabelaPrincipal, tituloTabela, startY);
+    // Adicionar o título da tabela como uma nova linha no array de dados
+    dadosTodasTabelas.push([tituloTabela]);
 
-    // Atualiza startY para a próxima tabela 
-    startY = doc.lastAutoTable.finalY + 10;
+    // Concatenar os dados da tabela principal 
+    dadosTodasTabelas.push(...dadosTabelaPrincipal);
 
     // Verificar se há uma tabela de detalhes relacionada
     const tabelaDetalhes = tabela.nextElementSibling.classList.contains('det-table')
@@ -77,62 +77,23 @@ function gerarPDF() {
 
     if (tabelaDetalhes) {
       const dadosTabelaDetalhes = extrairDadosTabela(tabelaDetalhes);
-      adicionarTabelaAoPDF(doc, dadosTabelaDetalhes, 'Detalhes', startY);
 
-      // Atualiza startY após a tabela de detalhes
-      startY = doc.lastAutoTable.finalY + 10;
+      // Adicionar o título "Detalhes" como uma nova linha
+      dadosTodasTabelas.push(['Detalhes']);
+
+      // Concatenar os dados da tabela de detalhes
+      dadosTodasTabelas.push(...dadosTabelaDetalhes);
     }
+
+    // Adicionar uma linha em branco para separar as tabelas
+    dadosTodasTabelas.push([]);
   });
 
-  // Adiciona o rodapé e a numeração de páginas
-  adicionarNumeracaoPaginas(doc);
-
-  doc.save(`${tituloPrincipal}_${subtitulo}.pdf`);
-}
-
-// Função para extrair dados de uma tabela HTML
-function extrairDadosTabela(tabela) {
-  const dados = [];
-  const cabecalho = [];
-  const linhas = tabela.querySelectorAll('tbody tr');
-
-  // Extrair dados do cabeçalho
-  tabela.querySelectorAll('thead th').forEach(th => {
-    cabecalho.push(th.textContent.trim());
-  });
-  dados.push(cabecalho);
-
-  // Extrair dados das linhas
-  linhas.forEach(linha => {
-    const linhaDados = [];
-    linha.querySelectorAll('td').forEach(td => {
-      linhaDados.push(td.textContent.trim());
-    });
-    dados.push(linhaDados);
-  });
-
-  return dados;
-}
-
-function adicionarCabecalho(doc, tituloPrincipal, subtitulo) {
-  let yPos = 10;
-  doc.text(tituloPrincipal, doc.internal.pageSize.width / 2, yPos, { align: 'center', fontSize: 10 });
-  yPos += 7;
-  doc.text(subtitulo, doc.internal.pageSize.width / 2, yPos, { align: 'center', fontSize: 10 });
-}
-
-function adicionarTabelaAoPDF(doc, dadosTabela, titulo, startY) {
-  const titleHeight = doc.getTextDimensions(titulo).h;
-
-  doc.setFontSize(10);
-  doc.text(titulo, doc.internal.pageSize.width / 2, startY + titleHeight - 5, {
-    align: 'center'
-  });
-
-  doc.autoTable({ // Acessa autoTable como propriedade do objeto doc
-    head: [dadosTabela[0]],
-    body: dadosTabela.slice(1),
-    startY: startY + titleHeight + 5,
+  // Chamar doc.autoTable apenas uma vez, com os dados de todas as tabelas
+  doc.autoTable({
+    head: [dadosTodasTabelas[0]], // O primeiro elemento é o cabeçalho da primeira tabela
+    body: dadosTodasTabelas.slice(1), // O restante são os dados das tabelas
+    startY: titleY + 40, // Começa abaixo do cabeçalho
     theme: 'grid',
     headStyles: {
       fillColor: [200, 230, 255],
@@ -208,6 +169,36 @@ function adicionarTabelaAoPDF(doc, dadosTabela, titulo, startY) {
       }
     }
   });
+
+  // Adiciona o rodapé e a numeração de páginas
+  adicionarNumeracaoPaginas(doc);
+
+  // Salva o PDF
+  doc.save(`${tituloPrincipal}_${subtitulo}.pdf`);
+}
+
+// Função para extrair dados de uma tabela HTML
+function extrairDadosTabela(tabela) {
+  const dados = [];
+  const cabecalho = [];
+  const linhas = tabela.querySelectorAll('tbody tr');
+
+  // Extrair dados do cabeçalho
+  tabela.querySelectorAll('thead th').forEach(th => {
+    cabecalho.push(th.textContent.trim());
+  });
+  dados.push(cabecalho);
+
+  // Extrair dados das linhas
+  linhas.forEach(linha => {
+    const linhaDados = [];
+    linha.querySelectorAll('td').forEach(td => {
+      linhaDados.push(td.textContent.trim());
+    });
+    dados.push(linhaDados);
+  });
+
+  return dados;
 }
 
 function adicionarNumeracaoPaginas(doc) {
@@ -225,4 +216,4 @@ function adicionarNumeracaoPaginas(doc) {
   }
 }
 
-export { gerarPDF }; 
+export { gerarPDF };
