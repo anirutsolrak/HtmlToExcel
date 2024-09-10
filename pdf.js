@@ -221,15 +221,15 @@ function adicionarTabelaAoPDF(doc, dadosTabela, titulo, startY) {
 }
 
 function adicionarNumeracaoPaginas(doc) {
-  const pageCount = doc.internal.getNumberOfPages();
+  const pageCount = doc.autoTable.previous.pageCount;
 
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
     const pageWidth = doc.internal.pageSize.width;
     const pageHeight = doc.internal.pageSize.height;
     const str = 'Página ' + i + ' de ' + pageCount;
-    doc.setFontSize(6);
-    doc.text(str, pageWidth - 10, pageHeight - 3, {
+    doc.setFontSize(8);
+    doc.text(str, pageWidth - 10, pageHeight - 5, {
       align: 'right'
     });
   }
