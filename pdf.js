@@ -1,5 +1,3 @@
-import { jsPDF } from 'jspdf';
-import autoTable from 'jspdf-autotable';
 import { extractTableData, extractTableHeaders } from './utils.js';
 
 export function exportToPDF() {
