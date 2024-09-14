@@ -1,4 +1,4 @@
-import * as XLSX from 'xlsx';
+//import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { extractTableData, extractTableHeaders } from './utils.js';
 
