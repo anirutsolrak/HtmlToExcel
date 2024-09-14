@@ -85,10 +85,11 @@ function exportToPDF() {
   const orientationSwitch = document.getElementById('orientacaoPDF');
   let orientation = orientationSwitch.checked ? 'landscape' : 'portrait';
 
+ const { jsPDF } = window.jspdf;
   const doc = new jsPDF({
-    orientation: orientation
+    orientation: orientation 
   });
-
+  
   const newLineHeightFactor = 0.5;
   doc.setLineHeightFactor(newLineHeightFactor);
 
