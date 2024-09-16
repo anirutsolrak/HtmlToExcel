@@ -410,7 +410,7 @@
         </table>
         <br>
         <!-- Modal para escolher o formato de download -->
-        <div class="modal fade" id="formatoModal" tabindex="-1" aria-labelledby="formatoModalLabel" aria-hidden="true">
+         <div class="modal fade" id="formatoModal" tabindex="-1" aria-labelledby="formatoModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -421,14 +421,17 @@
                         <button id="btn-excel" class="btn btn-outline-primary">Excel</button>
                         <button id="btn-pdf" class="btn btn-outline-primary">PDF</button>
                     </div>
-                    <div class="modal-footer justify-content-between"> 
+                    <div class="modal-footer justify-content-between">
                       <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="orientacaoPDF" checked>
-                        <label class="form-check-label" for="orientacaoPDF">Paisagem</label>
+                        <input class="form-check-input" type="checkbox" id="retratoPDF">
+                        <label class="form-check-label" for="retratoPDF">Retrato</label>
+                      </div>
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="paisagemPDF">
+                        <label class="form-check-label" for="paisagemPDF">Paisagem</label>
                       </div>
                       <button id="btn-fechar" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                     </div>
-
                     <style>
                       .form-check-input:checked {
                         background-color: #28a745; 
@@ -459,3 +462,4 @@
     <script src="script.js"></script>
 </body>
 </html>
+
