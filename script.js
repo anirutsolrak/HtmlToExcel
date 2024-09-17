@@ -159,7 +159,7 @@ function exportToPDF() {
         useHTML: true,
         pageBreak: 'avoid',
         headStyles: {
-          fillColor: [200, 230, 255],
+         // fillColor: [200, 230, 255],
           textColor: [0, 0, 0],
         },
         bodyStyles: {
