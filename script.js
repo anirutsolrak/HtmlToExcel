@@ -239,9 +239,12 @@ function addDynamicTextAndPageNumbers(doc) {
 }
 
 
-// Manipuladores de eventos para os botões
+// Manipuladores de eventos para os botões e checkboxes
 document.addEventListener('DOMContentLoaded', function() {
   const printButton = document.querySelector('.float-right.btn.btn-outline-primary');
+  const fecharButton = document.getElementById('btn-fechar'); 
+  const retratoCheckbox = document.getElementById('retratoPDF');
+  const paisagemCheckbox = document.getElementById('paisagemPDF');
 
   printButton.addEventListener('click', function(event) {
     event.preventDefault();
@@ -258,11 +261,17 @@ document.addEventListener('DOMContentLoaded', function() {
     $('#formatoModal').modal('hide');
   });
 
-  // Lógica para alternar entre os checkboxes
-  $('#retratoPDF, #paisagemPDF').change(function() {
-    if (this.checked) {
-      // Desmarca o outro checkbox
-      $('#' + (this.id === 'retratoPDF' ? 'paisagemPDF' : 'retratoPDF')).prop('checked', false);
-    }
+  // Manipulador de evento para o botão "Fechar"
+  fecharButton.addEventListener('click', function() {
+    $('#formatoModal').modal('hide');
+  });
+
+  // Lógica para alternar entre os checkboxes 
+  retratoCheckbox.addEventListener('change', function() {
+    paisagemCheckbox.checked = !this.checked;
+  });
+
+  paisagemCheckbox.addEventListener('change', function() {
+    retratoCheckbox.checked = !this.checked;
   });
 });
