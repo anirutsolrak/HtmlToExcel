@@ -220,7 +220,6 @@ function exportToPDF() {
 
     doc.save(document.querySelector('h3').textContent + '.pdf');
   };
-}
 
 function addDynamicTextAndPageNumbers(doc) {
   const pageCount = doc.internal.getNumberOfPages();
