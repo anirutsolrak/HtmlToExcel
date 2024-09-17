@@ -159,7 +159,7 @@ function exportToPDF() {
         useHTML: true,
         pageBreak: 'avoid',
         headStyles: {
-         // fillColor: [200, 230, 255],
+          fillColor: [200, 230, 255],
           textColor: [0, 0, 0],
         },
         bodyStyles: {
@@ -186,7 +186,7 @@ function exportToPDF() {
         },
         didParseCell: function (data) {
           if (data.row.index === 0 && data.section === 'body') {
-            data.cell.styles.fillColor = [200, 230, 255];
+            // data.cell.styles.fillColor = [200, 230, 255];
             data.cell.styles.textColor = [0, 0, 0];
           }
           if (data.section === 'body' && data.column.index === 0) {
