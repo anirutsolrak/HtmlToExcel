@@ -129,9 +129,8 @@ function exportToPDF() {
   const logoX = titleX + doc.getTextDimensions(mainTitle, { maxWidth: maxTitleWidth }).w / 2 + 5;
   const logoY = titleY - titleHeight / 2 - logoHeight / 2;
 
-  // Aguarda a imagem carregar para então desenhar o PDF
-  logoImg.onload = function() {
-    // Seleciona todas as tabelas de dados
+
+  // Seleciona todas as tabelas de dados
     const dataTables = document.querySelectorAll('.table.table-responsive.table-striped.table-bordered.table-sm');
 
     // Renderiza o título, subtítulo e logo na primeira página
