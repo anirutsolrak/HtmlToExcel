@@ -20,7 +20,47 @@
     .det-table thead tr th {
         background-color: #B0E0E6; /* Cor de fundo azul claro */
     }  
-</style>
+    /* Estilos para o modal */
+    #formatoModal .modal-dialog {
+      display: flex;
+      align-items: center; /* Centraliza verticalmente */
+      justify-content: center; /* Centraliza horizontalmente */
+      min-height: calc(100% - 3.5rem); /* Ajusta a altura mínima */
+    }
+
+    #formatoModal .modal-content {
+      border-radius: 10px; /* Cantos arredondados */
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2); /* Sombra */
+    }
+
+    #formatoModal .modal-header {
+      background-color: #f8f9fa; /* Cor de fundo do cabeçalho */
+      border-bottom: none; /* Remove a borda inferior */
+      border-top-left-radius: 10px; /* Cantos arredondados no topo */
+      border-top-right-radius: 10px;
+    }
+
+    #formatoModal .modal-title {
+      font-weight: 600; /* Título em negrito */
+    }
+
+    #formatoModal .btn-outline-primary {
+      border-radius: 5px; /* Cantos arredondados nos botões */
+    }
+
+    #formatoModal .form-check-input:checked {
+      background-color: #28a745;
+      border-color: #28a745;
+    }
+
+    #formatoModal .form-check-input:focus {
+      box-shadow: none;
+    }
+
+    #formatoModal .form-check-label {
+      margin-left: 10px;
+    }
+  </style>
 </head>
 <body>
     <div class="container"> 
@@ -409,49 +449,38 @@
             </tbody>
         </table>
         <br>
+
+        <button class="btn btn-outline-secondary" type="button" class="btn btn-info" onclick="history.back()">Voltar</button>
+        <button class="float-right btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#formatoModal">Imprimir</button>
+
         <!-- Modal para escolher o formato de download -->
-         <div class="modal fade" id="formatoModal" tabindex="-1" aria-labelledby="formatoModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
+        <div class="modal fade" id="formatoModal" tabindex="-1" aria-labelledby="formatoModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered"> 
+                <div class="modal-content shadow-lg">
                     <div class="modal-header">
                         <h5 class="modal-title" id="formatoModalLabel">Escolha o formato</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body">
-                        <button id="btn-excel" class="btn btn-outline-primary">Excel</button>
-                        <button id="btn-pdf" class="btn btn-outline-primary">PDF</button>
-                    </div>
-                    <div class="modal-footer justify-content-between">
-                      <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="retratoPDF">
+                    <div class="modal-body py-4 px-5">
+                        <button id="btn-excel" class="btn btn-outline-primary btn-block mb-3">Excel</button>
+                        <button id="btn-pdf" class="btn btn-outline-primary btn-block">PDF</button>
+
+                      <div class="form-check form-switch mt-3">
+                        <input class="form-check-input" type="checkbox" id="retratoPDF" checked>
                         <label class="form-check-label" for="retratoPDF">Retrato</label>
                       </div>
                       <div class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" id="paisagemPDF">
                         <label class="form-check-label" for="paisagemPDF">Paisagem</label>
                       </div>
+
+                    </div>
+                    <div class="modal-footer">
                       <button id="btn-fechar" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                     </div>
-                    <style>
-                      .form-check-input:checked {
-                        background-color: #28a745; 
-                        border-color: #28a745;
-                      }
-
-                      .form-check-input:focus {
-                        box-shadow: none;
-                      }
-
-                      .form-check-label {
-                        margin-left: 10px; 
-                      }
-                    </style>
                 </div>
             </div>
         </div>
-
-        <button class="btn btn-outline-secondary" type="button" class="btn btn-info" onclick="history.back()">Voltar</button>
-        <button class="float-right btn btn-outline-primary">Imprimir</button>
 
         <footer>
             <p><strong><span style="font-size: 9pt; color: rgb(0, 102, 0);">Sistemas integrados  <a href="http://www.cjpnet.com.br/" target="_blank">www.cjpnet.com.br</a></strong>
@@ -459,7 +488,6 @@
         </footer>
     </div>
 
-    <script src="script.js"></script>
+    <script src="script.js"></script> 
 </body>
 </html>
-
