@@ -28,9 +28,9 @@ function extractTableHeaders(table) {
     headers.push(rowData); 
   }
 
-  return headers[0].map((header, i) => header + (headers[1][i] ? ' / ' + headers[1][i] : ''));
+  // Verifica se headers[1] existe antes de acessar o índice 0
+  return headers[0].map((header, i) => header + (headers[1] && headers[1][i] ? ' / ' + headers[1][i] : ''));
 }
-
 // Função para exportar para Excel (CORRIGIDA)
 function exportToExcel() {
   const wb = XLSX.utils.book_new();
