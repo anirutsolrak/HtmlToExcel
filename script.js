@@ -152,96 +152,86 @@ function exportToPDF() {
     // Define a posição inicial Y para a primeira tabela (considerando o título e a logo)
     let startY = titleY + 30;
 
-    dataTables.forEach((table) => {
-      const tableData = extractTableData(table);
-      const tableHeaders = extractTableHeaders(table);
+     dataTables.forEach((table) => {
+    const tableData = extractTableData(table);
+    const tableHeaders = extractTableHeaders(table);
 
-      // Calcula o número total de colunas da tabela
-      let totalColumns = 0;
-      tableHeaders[0].forEach(header => {
-        totalColumns += parseInt(header.colspan || 1);
+    // Cria o cabeçalho da tabela usando HTML
+    let tableHeaderHTML = '<thead>';
+    tableHeaders.forEach(headerRow => {
+      tableHeaderHTML += '<tr>';
+      headerRow.forEach(headerCell => {
+        tableHeaderHTML += `<th colspan="${headercell.colSpan || 1}">${headerCell}</th>`;
       });
-
-      // Divide os cabeçalhos em duas linhas
-      const headerRow1 = tableHeaders[0]; // Títulos principais
-      const headerRow2 = tableHeaders[1]; // Subtítulos
-
-        // Cria a estrutura de cabeçalho para o jsPDF (CORRIGIDO)
- const header = [
-    headerRow1.map((headerText, index) => ({ 
-      content: headerText, 
-      styles: { 
-        colspan: table.querySelectorAll('thead tr:first-child th')[index].colSpan // Obtém o colspan do HTML
-      } 
-    })),
-    headerRow2 ? headerRow2.map(headerText => ({ content: headerText, styles: { colspan: 1 } })) : []
-  ];
-
-      doc.autoTable({
-         head: [headerRow1, headerRow2 ? headerRow2 : []], // Passa as duas linhas separadamente
-        body: tableData,
-        startY: startY,
-        theme: 'grid',
-        useHTML: true,
-        pageBreak: 'avoid',
-        headStyles: {
-          fillColor: [200, 230, 255],
-          textColor: [0, 0, 0],
-          halign: 'center' // Centraliza os cabeçalhos
-        },
-        bodyStyles: {
-          fillColor: false,
-        },
-        alternateRowStyles: {
-          fillColor: false,
-        },
-        rowPageBreak: 'noWrap',
-        overFlow: 'linebreak',
-        showHead: 'everyPage',
-        styles: {
-          fontSize: 7,
-          fontStyle: 'normal',
-          fontFamily: 'Calibri, sans-serif',
-        },
-        columns: Array.from({ length: totalColumns }, (_, i) => ({ dataKey: i })), // Usa o total de colunas
-        didDrawPage: function (data) {
-          if (data.pageNumber > 1) {
-            doc.setFontSize(10);
-            doc.text("HOSPITAL REGIONAL DA COSTA LESTE MAGID THOMÉ", 10, 10);
-            doc.text("RL06 - CUSTO SERVIÇOS AUXILIARES", 10, 18);
-          }
-        },
-        didParseCell: function (data) {
-          if (data.row.index === 0 && data.section === 'body') {
-            // data.cell.styles.fillColor = [200, 230, 255];
-            data.cell.styles.textColor = [0, 0, 0];
-          }
-          if (data.section === 'body' && data.column.index === 0) {
-            data.cell.styles.halign = 'left';
-          }
-          if (data.section === 'body' && data.column.index !== 0) {
-            data.cell.styles.halign = 'center';
-          }
-          if (data.cell.raw && data.cell.raw.includes('<strong>')) {
-            data.cell.styles.fontStyle = 'bold';
-            data.cell.text = data.cell.raw.replace(/<strong>/g, '').replace(/<\/strong>/g, '');
-          }
-        },
-        didDrawHeader: function (data) {
-          let titleHeight = doc.getTextDimensions(mainTitle, { maxWidth: maxTitleWidth }).h;
-          let titleX = doc.internal.pageSize.width / 2;
-          let titleY = data.settings.startY - titleHeight - 10;
-
-          doc.setFontSize(16);
-          doc.text(mainTitle, titleX, titleY, { align: 'center', maxWidth: maxTitleWidth });
-          doc.setFontSize(14);
-          doc.text(subtitle, titleX, titleY + 8, { align: 'center' });
-          doc.addImage(logoImg, 'PNG', logoX, logoY, logoWidth, logoHeight);
-        }
-      });
-
-      startY = doc.lastAutoTable.finalY + 10;
+      tableHeaderHTML += '</tr>';
     });
+    tableHeaderHTML += '</thead>';
+
+    // Cria uma nova tabela HTML com o cabeçalho e os dados
+    const tableHTML = `<table>${tableHeaderHTML}<tbody>${table.querySelector('tbody').innerHTML}</tbody></table>`;
+
+    doc.autoTable({
+      html: tableHTML, // Usa a tabela HTML completa
+      startY: startY,
+      theme: 'grid',
+      useHTML: true, // Ativa a renderização de HTML
+      pageBreak: 'avoid',
+      headStyles: {
+        fillColor: [200, 230, 255],
+        textColor: [0, 0, 0],
+        halign: 'center' // Centraliza os cabeçalhos
+      },
+      bodyStyles: {
+        fillColor: false,
+      },
+      alternateRowStyles: {
+        fillColor: false,
+      },
+      rowPageBreak: 'noWrap',
+      overFlow: 'linebreak',
+      showHead: 'everyPage',
+      styles: {
+        fontSize: 7,
+        fontStyle: 'normal',
+        fontFamily: 'Calibri, sans-serif',
+      },
+      didDrawPage: function (data) {
+        if (data.pageNumber > 1) {
+          doc.setFontSize(10);
+          doc.text("HOSPITAL REGIONAL DA COSTA LESTE MAGID THOMÉ", 10, 10);
+          doc.text("RL06 - CUSTO SERVIÇOS AUXILIARES", 10, 18);
+        }
+      },
+      didParseCell: function (data) {
+        if (data.row.index === 0 && data.section === 'body') {
+          data.cell.styles.textColor = [0, 0, 0];
+        }
+        if (data.section === 'body' && data.column.index === 0) {
+          data.cell.styles.halign = 'left';
+        }
+        if (data.section === 'body' && data.column.index !== 0) {
+          data.cell.styles.halign = 'center';
+        }
+        if (data.cell.raw && data.cell.raw.includes('<strong>')) {
+          data.cell.styles.fontStyle = 'bold';
+          data.cell.text = data.cell.raw.replace(/<strong>/g, '').replace(/<\/strong>/g, '');
+        }
+      },
+      didDrawHeader: function (data) {
+        let titleHeight = doc.getTextDimensions(mainTitle, { maxWidth: maxTitleWidth }).h;
+        let titleX = doc.internal.pageSize.width / 2;
+        let titleY = data.settings.startY - titleHeight - 10;
+
+        doc.setFontSize(16);
+        doc.text(mainTitle, titleX, titleY, { align: 'center', maxWidth: maxTitleWidth });
+        doc.setFontSize(14);
+        doc.text(subtitle, titleX, titleY + 8, { align: 'center' });
+        doc.addImage(logoImg, 'PNG', logoX, logoY, logoWidth, logoHeight);
+      }
+    });
+
+    startY = doc.lastAutoTable.finalY + 10;
+  });
 
     addDynamicTextAndPageNumbers(doc);
 
