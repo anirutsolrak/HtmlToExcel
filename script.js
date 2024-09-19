@@ -166,6 +166,12 @@ function exportToPDF() {
       const headerRow1 = tableHeaders[0]; // Títulos principais
       const headerRow2 = tableHeaders[1]; // Subtítulos
 
+        // Cria a estrutura de cabeçalho para o jsPDF (CORRIGIDO)
+  const header = [
+    headerRow1.map(headerText => ({ content: headerText, styles: { colspan: 2 } })), // colspan 2 para a primeira linha
+    headerRow2 ? headerRow2.map(headerText => ({ content: headerText, styles: { colspan: 1 } })) : [] // colspan 1 para a segunda linha
+  ];
+
       doc.autoTable({
          head: [headerRow1, headerRow2 ? headerRow2 : []], // Passa as duas linhas separadamente
         body: tableData,
