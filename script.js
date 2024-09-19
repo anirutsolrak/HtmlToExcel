@@ -1,9 +1,4 @@
-// Certifique-se de que as bibliotecas estejam incluídas no seu HTML antes deste script:
-// <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
-// <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-// <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-
-// Funções auxiliares para extrair dados da tabela (CORRIGIDAS)
+// Funções auxiliares para extrair dados da tabela
 function extractTableData(table) {
   const tableData = [];
   for (const row of table.querySelectorAll('tbody tr')) {
@@ -20,20 +15,35 @@ function extractTableHeaders(table) {
   const headers = [];
   const headerRows = table.querySelectorAll('thead tr');
 
-  for (let i = 0; i < headerRows.length; i++) {
-    const rowData = [];
-    for (const cell of headerRows[i].querySelectorAll('th')) {
-      // Adiciona o colspan como atributo ao cabeçalho
-      const colspan = cell.getAttribute('colspan') || 1;
-      rowData.push({ content: cell.textContent.trim(), colspan: colspan }); 
-    }
-    headers.push(rowData);
-  }
+  // Itera pelas linhas do cabeçalho
+  for (const row of headerRows) {
+    const rowHeaders = [];
+    let currentHeader = null;
+    let colspan = 1;
 
+    // Itera pelas células do cabeçalho
+    for (const cell of row.querySelectorAll('th')) {
+      // Verifica se a célula tem colspan
+      const cellColspan = parseInt(cell.getAttribute('colspan')) || 1;
+
+      // Se for uma nova célula de cabeçalho
+      if (colspan === 1) {
+        currentHeader = { content: cell.textContent.trim(), colspan: cellColspan, subHeaders: [] };
+        rowHeaders.push(currentHeader);
+        colspan = cellColspan;
+      } else {
+        // Se for um sub-cabeçalho
+        currentHeader.subHeaders.push(cell.textContent.trim());
+        colspan--;
+      }
+    }
+
+    headers.push(rowHeaders);
+  }
   return headers;
 }
 
-// Função para exportar para Excel (CORRIGIDA)
+// Função para exportar para Excel
 function exportToExcel() {
   const wb = XLSX.utils.book_new();
   const ws = XLSX.utils.aoa_to_sheet([]);
@@ -54,15 +64,28 @@ function exportToExcel() {
     const tableData = extractTableData(table);
     const tableHeaders = extractTableHeaders(table);
 
-    // Adiciona os cabeçalhos da tabela (ambas as linhas)
-    tableHeaders.forEach(headerRow => {
-      XLSX.utils.sheet_add_aoa(ws, [headerRow.map(headerObj => headerObj.content)], { origin: { r: currentRow, c: 0 } });
+    // Adiciona os cabeçalhos da tabela
+    tableHeaders.forEach((headerRow, rowIndex) => {
+      const rowData = [];
+      let colIndex = 0;
+      headerRow.forEach(header => {
+        rowData[colIndex] = header.content;
+        // Adiciona os sub-cabeçalhos na linha seguinte
+        if (rowIndex === 0 && header.subHeaders.length > 0) {
+          header.subHeaders.forEach(subHeader => {
+            colIndex++;
+            rowData[colIndex] = subHeader;
+          });
+        }
+        colIndex += header.colspan;
+      });
+      XLSX.utils.sheet_add_aoa(ws, [rowData], { origin: { r: currentRow, c: 0 } });
       currentRow++;
     });
 
     // Adiciona os dados da tabela com formatação de negrito
     tableData.forEach(rowData => {
-      const formattedRowData = rowData.map((cellData, cellIndex) => {
+      const formattedRowData = rowData.map(cellData => {
         if (cellData.includes('<strong>')) {
           const cellValue = cellData.replace(/<strong>/g, '').replace(/<\/strong>/g, '');
           return { v: cellValue, s: { font: { bold: true } } };
@@ -74,7 +97,7 @@ function exportToExcel() {
       currentRow++;
     });
 
-    currentRow += 2; 
+    currentRow += 2;
   });
 
   XLSX.utils.book_append_sheet(wb, ws, 'RelatorioCompleto');
@@ -84,7 +107,8 @@ function exportToExcel() {
   saveAs(blob, 'RelatorioCompleto.xlsx');
 }
 
-// Função para exportar para PDF (CORRIGIDA)
+
+// Função para exportar para PDF
 function exportToPDF() {
   // Obtém a orientação da página dos botões checkbox
   const retratoCheckbox = document.getElementById('retratoPDF');
@@ -151,15 +175,14 @@ function exportToPDF() {
     const tableData = extractTableData(table);
     const tableHeaders = extractTableHeaders(table);
 
-    // Define as colunas com base no primeiro cabeçalho 
-    const columns = tableHeaders[0].map(headerObj => ({
-      header: headerObj.content,
-      dataKey: headerObj.content, // Usa o conteúdo do cabeçalho como dataKey
-      colSpan: headerObj.colspan // Define o colspan
-    }));
+    // Cria a estrutura de cabeçalho para o jsPDF
+    const header = tableHeaders.map(headerRow => headerRow.map(headerObj => ({
+      content: headerObj.content,
+      styles: { colspan: headerObj.colspan }
+    })));
 
     doc.autoTable({
-      head: tableHeaders.map(headerRow => headerRow.map(headerObj => headerObj.content)), // Usa tableHeaders diretamente
+      head: header,
       body: tableData,
       startY: startY,
       theme: 'grid',
@@ -183,7 +206,6 @@ function exportToPDF() {
         fontStyle: 'normal',
         fontFamily: 'Calibri, sans-serif',
       },
-      columns: columns, // Define as colunas com base no array de cabeçalhos combinado
       didDrawPage: function (data) {
         if (data.pageNumber > 1) {
           doc.setFontSize(10);
@@ -193,7 +215,7 @@ function exportToPDF() {
       },
       didParseCell: function (data) {
         if (data.row.index === 0 && data.section === 'body') {
-          //data.cell.styles.fillColor = [200, 230, 255];
+          data.cell.styles.fillColor = [200, 230, 255];
           data.cell.styles.textColor = [0, 0, 0];
         }
         if (data.section === 'body' && data.column.index === 0) {
@@ -227,6 +249,7 @@ function exportToPDF() {
 
   doc.save(document.querySelector('h3').textContent + '.pdf');
 }
+
 
 function addDynamicTextAndPageNumbers(doc) {
   const pageCount = doc.internal.getNumberOfPages();
