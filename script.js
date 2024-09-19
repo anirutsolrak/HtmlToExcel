@@ -150,74 +150,75 @@ function exportToPDF() {
     const tableHeader = table.querySelector('thead');
 
     // Cria uma nova tabela HTML com o cabeçalho e os dados
-    const tableHTML = `<table>${tableHeader.outerHTML}<tbody>${table.querySelector('tbody').innerHTML}</tbody></table>`;
+   const tableHTML = `<table>${tableHeader.outerHTML}<tbody>${table.querySelector('tbody').innerHTML}</tbody></table>`;
 
-    // Converte a string tableHTML em um elemento HTML
-    const parser = new DOMParser();
-    const tableElement = parser.parseFromString(tableHTML, 'text/html').querySelector('table');
+  // Converte a string tableHTML em um elemento HTML
+  const parser = new DOMParser();
+  const tableElement = parser.parseFromString(tableHTML, 'text/html').querySelector('table'); 
 
-    doc.autoTable({
-      html: tableElement, // Usa o elemento HTML da tabela
-      startY: startY,
-      theme: 'grid',
-      useHTML: true, // Ativa a renderização de HTML
-      pageBreak: 'avoid',
-      headStyles: {
-        fillColor: [200, 230, 255],
-        textColor: [0, 0, 0],
-        halign: 'center' // Centraliza os cabeçalhos
-      },
-      bodyStyles: {
-        fillColor: false,
-      },
-      alternateRowStyles: {
-        fillColor: false,
-      },
-      rowPageBreak: 'noWrap',
-      overFlow: 'linebreak',
-      showHead: 'everyPage',
-      styles: {
-        fontSize: 7,
-        fontStyle: 'normal',
-        fontFamily: 'Calibri, sans-serif',
-      },
-      didDrawPage: function (data) {
-        if (data.pageNumber > 1) {
-          doc.setFontSize(10);
-          doc.text("HOSPITAL REGIONAL DA COSTA LESTE MAGID THOMÉ", 10, 10);
-          doc.text("RL06 - CUSTO SERVIÇOS AUXILIARES", 10, 18);
-        }
-      },
-      didParseCell: function (data) {
-        if (data.row.index === 0 && data.section === 'body') {
-          data.cell.styles.textColor = [0, 0, 0];
-        }
-        if (data.section === 'body' && data.column.index === 0) {
-          data.cell.styles.halign = 'left';
-        }
-        if (data.section === 'body' && data.column.index !== 0) {
-          data.cell.styles.halign = 'center';
-        }
-        if (data.cell.raw && data.cell.raw.includes('<strong>')) {
-          data.cell.styles.fontStyle = 'bold';
-          data.cell.text = data.cell.raw.replace(/<strong>/g, '').replace(/<\/strong>/g, '');
-        }
-      },
-      didDrawHeader: function (data) {
-        let titleHeight = doc.getTextDimensions(mainTitle, { maxWidth: maxTitleWidth }).h;
-        let titleX = doc.internal.pageSize.width / 2;
-        let titleY = data.settings.startY - titleHeight - 10;
-
-        doc.setFontSize(16);
-        doc.text(mainTitle, titleX, titleY, { align: 'center', maxWidth: maxTitleWidth });
-        doc.setFontSize(14);
-        doc.text(subtitle, titleX, titleY + 8, { align: 'center' });
-        doc.addImage(logoImg, 'PNG', logoX, logoY, logoWidth, logoHeight);
+  doc.autoTable({
+    html: tableElement, // Usa o elemento HTML da tabela
+    startY: startY,
+    theme: 'grid',
+    useHTML: true, // Ativa a renderização de HTML
+    pageBreak: 'avoid',
+    headStyles: {
+      fillColor: [200, 230, 255],
+      textColor: [0, 0, 0],
+      halign: 'center' // Centraliza os cabeçalhos
+    },
+    bodyStyles: {
+      fillColor: false,
+    },
+    alternateRowStyles: {
+      fillColor: false,
+    },
+    rowPageBreak: 'noWrap',
+    overFlow: 'linebreak',
+    showHead: 'everyPage',
+    styles: {
+      fontSize: 7,
+      fontStyle: 'normal',
+      fontFamily: 'Calibri, sans-serif',
+    },
+    didDrawPage: function (data) {
+      if (data.pageNumber > 1) {
+        doc.setFontSize(10);
+        doc.text("HOSPITAL REGIONAL DA COSTA LESTE MAGID THOMÉ", 10, 10);
+        doc.text("RL06 - CUSTO SERVIÇOS AUXILIARES", 10, 18);
       }
-    });
+    },
+    didParseCell: function (data) {
+      if (data.row.index === 0 && data.section === 'body') {
+        data.cell.styles.textColor = [0, 0, 0];
+      }
+      if (data.section === 'body' && data.column.index === 0) {
+        data.cell.styles.halign = 'left';
+      }
+      if (data.section === 'body' && data.column.index !== 0) {
+        data.cell.styles.halign = 'center';
+      }
+      if (data.cell.raw && data.cell.raw.includes('<strong>')) {
+        data.cell.styles.fontStyle = 'bold';
+        data.cell.text = data.cell.raw.replace(/<strong>/g, '').replace(/<\/strong>/g, '');
+      }
+    },
+    didDrawHeader: function (data) {
+      let titleHeight = doc.getTextDimensions(mainTitle, { maxWidth: maxTitleWidth }).h;
+      let titleX = doc.internal.pageSize.width / 2;
+      let titleY = data.settings.startY - titleHeight - 10;
 
-    startY = doc.lastAutoTable.finalY + 10;
+      doc.setFontSize(16);
+      doc.text(mainTitle, titleX, titleY, { align: 'center', maxWidth: maxTitleWidth });
+      doc.setFontSize(14);
+      doc.text(subtitle, titleX, titleY + 8, { align: 'center' });
+      doc.addImage(logoImg, 'PNG', logoX, logoY, logoWidth, logoHeight);
+    }
   });
+
+  startY = doc.lastAutoTable.finalY + 10;
+});
+
 
   addDynamicTextAndPageNumbers(doc);
 
