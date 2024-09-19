@@ -231,8 +231,8 @@ function exportToPDF() {
           data.cell.styles.halign = 'center';
         }
         // Verifica se a célula contém a tag <strong>
-        if (data.cell.raw && data.cell.raw.includes('<strong>')) { 
-          data.cell.styles.fontStyle = 'bold';
+        /* if (data.cell.raw && data.cell.raw.includes('<strong>')) { 
+          data.cell.styles.fontStyle = 'bold'; */
         }
       },
       didDrawHeader: function (data) {
