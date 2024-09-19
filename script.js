@@ -181,14 +181,13 @@ function exportToPDF() {
     const tableData = extractTableData(table);
     const tableHeaders = extractTableHeaders(table);
 
-    // Cria a estrutura de cabeçalho para o jsPDF
-    const header = tableHeaders.map(headerRow => headerRow.map(headerObj => ({
-      content: headerObj.content,
-      styles: { colspan: headerObj.colspan }
-    })));
+    // Define as colunas usando os subcabeçalhos
+    const columns = tableHeaders[0].map(headerObj => headerObj.subHeaders)
+      .flat() // Achatando o array de subcabeçalhos
+      .map(subHeader => ({ header: subHeader, dataKey: subHeader }));
 
     doc.autoTable({
-      head: header,
+      head: tableHeaders.map(headerRow => headerRow.map(headerObj => headerObj.content)),
       body: tableData,
       startY: startY,
       theme: 'grid',
@@ -212,6 +211,7 @@ function exportToPDF() {
         fontStyle: 'normal',
         fontFamily: 'Calibri, sans-serif',
       },
+      columns: columns, // Define as colunas aqui
       didDrawPage: function (data) {
         if (data.pageNumber > 1) {
           doc.setFontSize(10);
@@ -231,9 +231,9 @@ function exportToPDF() {
           data.cell.styles.halign = 'center';
         }
         // Verifica se a célula contém a tag <strong>
-        /* if (data.cell.raw && data.cell.raw.includes('<strong>')) { 
+        if (data.cell.raw && data.cell.raw.includes('<strong>')) { 
           data.cell.styles.fontStyle = 'bold';
-        } */
+        }
       },
       didDrawHeader: function (data) {
         let titleHeight = doc.getTextDimensions(mainTitle, { maxWidth: maxTitleWidth }).h;
