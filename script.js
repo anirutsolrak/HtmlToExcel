@@ -156,21 +156,15 @@ function exportToPDF() {
     const tableData = extractTableData(table);
     const tableHeaders = extractTableHeaders(table);
 
-    // Cria o cabeçalho da tabela usando HTML
-     let tableHeaderHTML = '<thead>';
-  tableHeaders.forEach((headerRow, rowIndex) => { // Adiciona rowIndex para acessar a linha correta
-    tableHeaderHTML += '<tr>';
-    const headerCells = table.querySelectorAll(`thead tr:nth-child(${rowIndex + 1}) th`); // Seleciona as células <th> da linha atual
-    Array.from(headerCells).forEach(headerCell => { // Itera pelas células <th>
-      tableHeaderHTML += `<th colspan="${headerCell.colSpan || 1}">${headerCell.textContent.trim()}</th>`; 
-    });
-    tableHeaderHTML += '</tr>';
-  });
-  tableHeaderHTML += '</thead>';
+   // Obtém o elemento <thead> da tabela
+  const tableHeader = table.querySelector('thead');
 
-    // Cria uma nova tabela HTML com o cabeçalho e os dados
-    const tableHTML = `<table>${tableHeaderHTML}<tbody>${table.querySelector('tbody').innerHTML}</tbody></table>`;
+  // Cria uma nova tabela HTML com o cabeçalho e os dados
+  const tableHTML = `<table>${tableHeader.outerHTML}<tbody>${table.querySelector('tbody').innerHTML}</tbody></table>`;
 
+  // Converte a string tableHTML em um elemento HTML
+  const parser = new DOMParser();
+  const tableElement = parser.parseFromString(tableHTML, 'text/html').querySelector('table');
     doc.autoTable({
       html: tableHTML, // Usa a tabela HTML completa
       startY: startY,
