@@ -24,7 +24,7 @@ function extractTableHeaders(table) {
   return headers;
 }
 
-// Função para exportar para Excel
+// Função para exportar para Excel (CORRIGIDA)
 function exportToExcel() {
   const wb = XLSX.utils.book_new();
   const ws = XLSX.utils.aoa_to_sheet([]);
@@ -45,31 +45,41 @@ function exportToExcel() {
     const tableData = extractTableData(table);
     const tableHeaders = extractTableHeaders(table);
 
-    // Define as colunas a serem usadas, dependendo do tipo da tabela
-    let columnsToUse = [0, 1, 2, 3]; // Colunas padrão para tabelas principais
-    if (table.classList.contains('det-table')) {
-      columnsToUse = [0, 1, 2]; // Colunas para tabelas de detalhes
-    }
-
-    // Adiciona os cabeçalhos da tabela
-    XLSX.utils.sheet_add_aoa(ws, [tableHeaders.slice(0, columnsToUse.length)], { origin: { r: currentRow, c: 0 } });
-    currentRow++;
+    // Adiciona os cabeçalhos da tabela (ambas as linhas)
+    tableHeaders.forEach((headerRow, rowIndex) => {
+      const rowData = [];
+      let colIndex = 0;
+      headerRow.forEach(header => {
+        rowData[colIndex] = header;
+        // Adiciona os sub-cabeçalhos na linha seguinte
+        if (rowIndex === 0 && header.subHeaders.length > 0) {
+          header.subHeaders.forEach(subHeader => {
+            colIndex++;
+            rowData[colIndex] = subHeader;
+          });
+        }
+        colIndex += header.colspan;
+      });
+      XLSX.utils.sheet_add_aoa(ws, [rowData], { origin: { r: currentRow, c: 0 } });
+      currentRow++;
+    });
 
     // Adiciona os dados da tabela com formatação de negrito
     tableData.forEach(rowData => {
-      const formattedRowData = rowData.map((cellData, cellIndex) => {
-        if (columnsToUse.includes(cellIndex) && cellData.includes('<strong>')) {
+      const formattedRowData = rowData.map(cellData => {
+        // Verifica se a célula possui a tag <strong> usando expressão regular
+        if (cellData.match(/<strong>/)) {
           const cellValue = cellData.replace(/<strong>/g, '').replace(/<\/strong>/g, '');
           return { v: cellValue, s: { font: { bold: true } } };
-        } else if (columnsToUse.includes(cellIndex)) {
+        } else {
           return cellData;
         }
-      }).filter(Boolean);
+      });
       XLSX.utils.sheet_add_aoa(ws, [formattedRowData], { origin: { r: currentRow, c: 0 } });
       currentRow++;
     });
 
-    currentRow += 2;
+    currentRow += 2; 
   });
 
   XLSX.utils.book_append_sheet(wb, ws, 'RelatorioCompleto');
@@ -77,9 +87,7 @@ function exportToExcel() {
   const excelFile = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
   const blob = new Blob([excelFile], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
   saveAs(blob, 'RelatorioCompleto.xlsx');
-}
-
-// Função para exportar para PDF (CORRIGIDA)
+}// Função para exportar para PDF (CORRIGIDA)
 function exportToPDF() {
   // Obtém a orientação da página dos botões checkbox
   const retratoCheckbox = document.getElementById('retratoPDF');
