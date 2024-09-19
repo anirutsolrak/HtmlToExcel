@@ -3,14 +3,13 @@
 // <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 // <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
-// Funções auxiliares para extrair dados da tabela 
+// Funções auxiliares para extrair dados da tabela
 function extractTableData(table) {
   const tableData = [];
   for (const row of table.querySelectorAll('tbody tr')) {
     const rowData = [];
     for (const cell of row.querySelectorAll('td')) {
-      // Extrai apenas o texto da célula, sem as tags HTML
-      rowData.push(cell.textContent.trim()); 
+      rowData.push(cell.innerHTML.trim());
     }
     tableData.push(rowData);
   }
@@ -21,30 +20,23 @@ function extractTableHeaders(table) {
   const headers = [];
   const headerRows = table.querySelectorAll('thead tr');
 
-  // Itera pelas linhas do cabeçalho
-  for (const row of headerRows) {
-    const rowHeaders = [];
-    let currentHeader = null;
-    let colspan = 1;
+  for (let i = 0; i < headerRows.length; i++) {
+    const rowData = [];
+    let colIndex = 0;
 
-    // Itera pelas células do cabeçalho
-    for (const cell of row.querySelectorAll('th')) {
-      // Verifica se a célula tem colspan
-      const cellColspan = parseInt(cell.getAttribute('colspan')) || 1;
+    for (const cell of headerRows[i].querySelectorAll('th')) {
+      const colspan = parseInt(cell.getAttribute('colspan')) || 1;
 
-      // Se for uma nova célula de cabeçalho
-      if (colspan === 1) {
-        currentHeader = { content: cell.textContent.trim(), colspan: cellColspan, subHeaders: [] };
-        rowHeaders.push(currentHeader);
-        colspan = cellColspan;
-      } else {
-        // Se for um sub-cabeçalho
-        currentHeader.subHeaders.push(cell.textContent.trim());
-        colspan--;
-      }
+      rowData.push({
+        content: cell.textContent.trim(),
+        colspan: colspan,
+        colIndex: colIndex // Adiciona o índice da coluna
+      });
+
+      colIndex += colspan;
     }
 
-    headers.push(rowHeaders);
+    headers.push(rowData);
   }
   return headers;
 }
@@ -70,35 +62,26 @@ function exportToExcel() {
     const tableData = extractTableData(table);
     const tableHeaders = extractTableHeaders(table);
 
+    // Define as colunas a serem usadas, dependendo do tipo da tabela
+    let columnsToUse = [0, 1, 2, 3]; // Colunas padrão para tabelas principais
+    if (table.classList.contains('det-table')) {
+      columnsToUse = [0, 1, 2]; // Colunas para tabelas de detalhes
+    }
+
     // Adiciona os cabeçalhos da tabela
-    tableHeaders.forEach((headerRow, rowIndex) => {
-      const rowData = [];
-      let colIndex = 0;
-      headerRow.forEach(header => {
-        rowData[colIndex] = header.content;
-        // Adiciona os sub-cabeçalhos na linha seguinte
-        if (rowIndex === 0 && header.subHeaders.length > 0) {
-          header.subHeaders.forEach(subHeader => {
-            colIndex++;
-            rowData[colIndex] = subHeader;
-          });
-        }
-        colIndex += header.colspan;
-      });
-      XLSX.utils.sheet_add_aoa(ws, [rowData], { origin: { r: currentRow, c: 0 } });
-      currentRow++;
-    });
+    XLSX.utils.sheet_add_aoa(ws, [tableHeaders.slice(0, columnsToUse.length)], { origin: { r: currentRow, c: 0 } });
+    currentRow++;
 
     // Adiciona os dados da tabela com formatação de negrito
     tableData.forEach(rowData => {
-      const formattedRowData = rowData.map(cellData => {
-        if (cellData.includes('<strong>')) {
+      const formattedRowData = rowData.map((cellData, cellIndex) => {
+        if (columnsToUse.includes(cellIndex) && cellData.includes('<strong>')) {
           const cellValue = cellData.replace(/<strong>/g, '').replace(/<\/strong>/g, '');
           return { v: cellValue, s: { font: { bold: true } } };
-        } else {
+        } else if (columnsToUse.includes(cellIndex)) {
           return cellData;
         }
-      });
+      }).filter(Boolean);
       XLSX.utils.sheet_add_aoa(ws, [formattedRowData], { origin: { r: currentRow, c: 0 } });
       currentRow++;
     });
@@ -112,7 +95,6 @@ function exportToExcel() {
   const blob = new Blob([excelFile], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
   saveAs(blob, 'RelatorioCompleto.xlsx');
 }
-
 
 // Função para exportar para PDF
 function exportToPDF() {
@@ -164,98 +146,99 @@ function exportToPDF() {
   const logoX = titleX + doc.getTextDimensions(mainTitle, { maxWidth: maxTitleWidth }).w / 2 + 5;
   const logoY = titleY - titleHeight / 2 - logoHeight / 2;
 
+
   // Seleciona todas as tabelas de dados
-  const dataTables = document.querySelectorAll('.table.table-responsive.table-striped.table-bordered.table-sm');
+    const dataTables = document.querySelectorAll('.table.table-responsive.table-striped.table-bordered.table-sm');
 
-  // Renderiza o título, subtítulo e logo na primeira página
-  doc.setFontSize(16);
-  doc.text(mainTitle, titleX, titleY, { align: 'center', maxWidth: maxTitleWidth });
-  doc.setFontSize(14);
-  doc.text(subtitle, titleX, titleY + 8, { align: 'center' });
-  doc.addImage(logoImg, 'PNG', logoX, logoY, logoWidth, logoHeight);
+    // Renderiza o título, subtítulo e logo na primeira página
+    doc.setFontSize(16);
+    doc.text(mainTitle, titleX, titleY, { align: 'center', maxWidth: maxTitleWidth });
+    doc.setFontSize(14);
+    doc.text(subtitle, titleX, titleY + 8, { align: 'center' });
+    doc.addImage(logoImg, 'PNG', logoX, logoY, logoWidth, logoHeight);
 
-  // Define a posição inicial Y para a primeira tabela (considerando o título e a logo)
-  let startY = titleY + 30;
+    // Define a posição inicial Y para a primeira tabela (considerando o título e a logo)
+    let startY = titleY + 30;
 
-  dataTables.forEach((table) => {
-    const tableData = extractTableData(table);
-    const tableHeaders = extractTableHeaders(table);
+    dataTables.forEach((table) => {
+      const tableData = extractTableData(table);
+      const tableHeaders = extractTableHeaders(table);
 
-    // Define as colunas usando os subcabeçalhos
-    const columns = tableHeaders[0].map(headerObj => headerObj.subHeaders)
-      .flat() // Achatando o array de subcabeçalhos
-      .map(subHeader => ({ header: subHeader, dataKey: subHeader }));
+      // Define as colunas usando os subtítulos
+      const columns = tableHeaders[1].map(headerObj => ({ 
+        header: headerObj.content, 
+        dataKey: headerObj.colIndex // Usa o índice da coluna como dataKey
+      }));
 
-    doc.autoTable({
-      head: tableHeaders.map(headerRow => headerRow.map(headerObj => headerObj.content)),
-      body: tableData,
-      startY: startY,
-      theme: 'grid',
-      useHTML: true,
-      pageBreak: 'avoid',
-      headStyles: {
-        fillColor: [200, 230, 255],
-        textColor: [0, 0, 0],
-      },
-      bodyStyles: {
-        fillColor: false,
-      },
-      alternateRowStyles: {
-        fillColor: false,
-      },
-      rowPageBreak: 'noWrap',
-      overFlow: 'linebreak',
-      showHead: 'everyPage',
-      styles: {
-        fontSize: 7,
-        fontStyle: 'normal',
-        fontFamily: 'Calibri, sans-serif',
-      },
-      columns: columns, // Define as colunas aqui
-      didDrawPage: function (data) {
-        if (data.pageNumber > 1) {
-          doc.setFontSize(10);
-          doc.text("HOSPITAL REGIONAL DA COSTA LESTE MAGID THOMÉ", 10, 10);
-          doc.text("RL06 - CUSTO SERVIÇOS AUXILIARES", 10, 18);
+      doc.autoTable({
+        head: tableHeaders.map(headerRow => headerRow.map(headerObj => headerObj.content)),
+        body: tableData,
+        startY: startY,
+        theme: 'grid',
+        useHTML: true,
+        pageBreak: 'avoid',
+        headStyles: {
+          fillColor: [200, 230, 255],
+          textColor: [0, 0, 0],
+        },
+        bodyStyles: {
+          fillColor: false,
+        },
+        alternateRowStyles: {
+          fillColor: false,
+        },
+        rowPageBreak: 'noWrap',
+        overFlow: 'linebreak',
+        showHead: 'everyPage',
+        styles: {
+          fontSize: 7,
+          fontStyle: 'normal',
+          fontFamily: 'Calibri, sans-serif',
+        },
+        columns: columns, // Define as colunas aqui
+        didDrawPage: function (data) {
+          if (data.pageNumber > 1) {
+            doc.setFontSize(10);
+            doc.text("HOSPITAL REGIONAL DA COSTA LESTE MAGID THOMÉ", 10, 10);
+            doc.text("RL06 - CUSTO SERVIÇOS AUXILIARES", 10, 18);
+          }
+        },
+        didParseCell: function (data) {
+          if (data.row.index === 0 && data.section === 'body') {
+            data.cell.styles.fillColor = [200, 230, 255];
+            data.cell.styles.textColor = [0, 0, 0];
+          }
+          if (data.section === 'body' && data.column.index === 0) {
+            data.cell.styles.halign = 'left';
+          }
+          if (data.section === 'body' && data.column.index !== 0) {
+            data.cell.styles.halign = 'center';
+          }
+          if (data.cell.raw && data.cell.raw.includes('<strong>')) {
+            data.cell.styles.fontStyle = 'bold';
+            data.cell.text = data.cell.raw.replace(/<strong>/g, '').replace(/<\/strong>/g, '');
+          }
+        },
+        didDrawHeader: function (data) {
+          let titleHeight = doc.getTextDimensions(mainTitle, { maxWidth: maxTitleWidth }).h;
+          let titleX = doc.internal.pageSize.width / 2;
+          let titleY = data.settings.startY - titleHeight - 10;
+
+          doc.setFontSize(16);
+          doc.text(mainTitle, titleX, titleY, { align: 'center', maxWidth: maxTitleWidth });
+          doc.setFontSize(14);
+          doc.text(subtitle, titleX, titleY + 8, { align: 'center' });
+          doc.addImage(logoImg, 'PNG', logoX, logoY, logoWidth, logoHeight);
         }
-      },
-      didParseCell: function (data) {
-        if (data.row.index === 0 && data.section === 'body') {
-          data.cell.styles.fillColor = [200, 230, 255];
-          data.cell.styles.textColor = [0, 0, 0];
-        }
-        if (data.section === 'body' && data.column.index === 0) {
-          data.cell.styles.halign = 'left';
-        }
-        if (data.section === 'body' && data.column.index !== 0) {
-          data.cell.styles.halign = 'center';
-        }
-        // Verifica se a célula contém a tag <strong>
-        if (data.cell.raw && data.cell.raw.includes('<strong>')) { 
-          data.cell.styles.fontStyle = 'bold';
-        }
-      },
-      didDrawHeader: function (data) {
-        let titleHeight = doc.getTextDimensions(mainTitle, { maxWidth: maxTitleWidth }).h;
-        let titleX = doc.internal.pageSize.width / 2;
-        let titleY = data.settings.startY - titleHeight - 10;
+      });
 
-        doc.setFontSize(16);
-        doc.text(mainTitle, titleX, titleY, { align: 'center', maxWidth: maxTitleWidth });
-        doc.setFontSize(14);
-        doc.text(subtitle, titleX, titleY + 8, { align: 'center' });
-        doc.addImage(logoImg, 'PNG', logoX, logoY, logoWidth, logoHeight);
-      }
+      startY = doc.lastAutoTable.finalY + 10;
     });
 
-    startY = doc.lastAutoTable.finalY + 10;
-  });
+    addDynamicTextAndPageNumbers(doc);
 
-  addDynamicTextAndPageNumbers(doc);
-
-  doc.save(document.querySelector('h3').textContent + '.pdf');
-}
-
+    doc.save(document.querySelector('h3').textContent + '.pdf');
+  };
 
 function addDynamicTextAndPageNumbers(doc) {
   const pageCount = doc.internal.getNumberOfPages();
@@ -271,6 +254,7 @@ function addDynamicTextAndPageNumbers(doc) {
     });
   }
 }
+
 
 // Manipuladores de eventos para os botões e checkboxes
 document.addEventListener('DOMContentLoaded', function() {
