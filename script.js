@@ -232,8 +232,8 @@ function exportToPDF() {
         }
         // Verifica se a célula contém a tag <strong>
         /* if (data.cell.raw && data.cell.raw.includes('<strong>')) { 
-          data.cell.styles.fontStyle = 'bold'; */
-        }
+          data.cell.styles.fontStyle = 'bold';
+        } */
       },
       didDrawHeader: function (data) {
         let titleHeight = doc.getTextDimensions(mainTitle, { maxWidth: maxTitleWidth }).h;
