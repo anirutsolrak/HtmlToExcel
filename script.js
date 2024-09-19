@@ -167,9 +167,14 @@ function exportToPDF() {
       const headerRow2 = tableHeaders[1]; // Subtítulos
 
         // Cria a estrutura de cabeçalho para o jsPDF (CORRIGIDO)
-  const header = [
-    headerRow1.map(headerText => ({ content: headerText, styles: { colspan: 2 } })), // colspan 2 para a primeira linha
-    headerRow2 ? headerRow2.map(headerText => ({ content: headerText, styles: { colspan: 1 } })) : [] // colspan 1 para a segunda linha
+ const header = [
+    headerRow1.map((headerText, index) => ({ 
+      content: headerText, 
+      styles: { 
+        colspan: table.querySelectorAll('thead tr:first-child th')[index].colSpan // Obtém o colspan do HTML
+      } 
+    })),
+    headerRow2 ? headerRow2.map(headerText => ({ content: headerText, styles: { colspan: 1 } })) : []
   ];
 
       doc.autoTable({
