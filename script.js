@@ -1,4 +1,9 @@
-// Funções auxiliares para extrair dados da tabela
+// Certifique-se de que as bibliotecas estejam incluídas no seu HTML antes deste script:
+// <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+// <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+// <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+// Funções auxiliares para extrair dados da tabela 
 function extractTableData(table) {
   const tableData = [];
   for (const row of table.querySelectorAll('tbody tr')) {
@@ -225,9 +230,9 @@ function exportToPDF() {
         if (data.section === 'body' && data.column.index !== 0) {
           data.cell.styles.halign = 'center';
         }
-        if (data.cell.raw && data.cell.raw.includes('<strong>')) {
+        // Verifica se a célula contém a tag <strong>
+        if (data.cell.raw && data.cell.raw.includes('<strong>')) { 
           data.cell.styles.fontStyle = 'bold';
-          data.cell.text = data.cell.raw.replace(/<strong>/g, '').replace(/<\/strong>/g, '');
         }
       },
       didDrawHeader: function (data) {
