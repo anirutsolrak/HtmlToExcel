@@ -20,26 +20,14 @@ function extractTableHeaders(table) {
   const headers = [];
   const headerRows = table.querySelectorAll('thead tr');
 
-  // Obtem os cabeçalhos da primeira linha
-  const firstRowHeaders = Array.from(headerRows[0].querySelectorAll('th'))
-    .map(cell => cell.textContent.trim());
-
-  // Se houver mais de uma linha de cabeçalho, combina com a primeira
-  if (headerRows.length > 1) {
-    Array.from(headerRows[1].querySelectorAll('th'))
-      .map((cell, index) => {
-        // Combina os cabeçalhos em pares de duas colunas
-        if (index % 2 === 0) {
-          headers.push([firstRowHeaders[index], cell.textContent.trim()]); 
-        } else {
-          headers[headers.length - 1].push(cell.textContent.trim());
-        }
-      });
-  } else {
-    // Se houver apenas uma linha de cabeçalho, agrupa em pares
-    for (let i = 0; i < firstRowHeaders.length; i += 2) {
-      headers.push([firstRowHeaders[i], firstRowHeaders[i + 1] || '']);
+  for (let i = 0; i < headerRows.length; i++) {
+    const rowData = [];
+    for (const cell of headerRows[i].querySelectorAll('th')) {
+      // Adiciona o colspan como atributo ao cabeçalho
+      const colspan = cell.getAttribute('colspan') || 1;
+      rowData.push({ content: cell.textContent.trim(), colspan: colspan }); 
     }
+    headers.push(rowData);
   }
 
   return headers;
@@ -66,31 +54,27 @@ function exportToExcel() {
     const tableData = extractTableData(table);
     const tableHeaders = extractTableHeaders(table);
 
-    // Define as colunas a serem usadas, dependendo do tipo da tabela
-    let columnsToUse = [0, 1, 2, 3]; // Colunas padrão para tabelas principais
-    if (table.classList.contains('det-table')) {
-      columnsToUse = [0, 1, 2]; // Colunas para tabelas de detalhes
-    }
-
-    // Adiciona os cabeçalhos da tabela em duas linhas separadas
-    XLSX.utils.sheet_add_aoa(ws, [tableHeaders.slice(0, columnsToUse.length)], { origin: { r: currentRow, c: 0 } });
-    currentRow++;
+    // Adiciona os cabeçalhos da tabela (ambas as linhas)
+    tableHeaders.forEach(headerRow => {
+      XLSX.utils.sheet_add_aoa(ws, [headerRow.map(headerObj => headerObj.content)], { origin: { r: currentRow, c: 0 } });
+      currentRow++;
+    });
 
     // Adiciona os dados da tabela com formatação de negrito
     tableData.forEach(rowData => {
       const formattedRowData = rowData.map((cellData, cellIndex) => {
-        if (columnsToUse.includes(cellIndex) && cellData.includes('<strong>')) {
+        if (cellData.includes('<strong>')) {
           const cellValue = cellData.replace(/<strong>/g, '').replace(/<\/strong>/g, '');
           return { v: cellValue, s: { font: { bold: true } } };
-        } else if (columnsToUse.includes(cellIndex)) {
+        } else {
           return cellData;
         }
-      }).filter(Boolean);
+      });
       XLSX.utils.sheet_add_aoa(ws, [formattedRowData], { origin: { r: currentRow, c: 0 } });
       currentRow++;
     });
 
-    currentRow += 2;
+    currentRow += 2; 
   });
 
   XLSX.utils.book_append_sheet(wb, ws, 'RelatorioCompleto');
@@ -167,11 +151,15 @@ function exportToPDF() {
     const tableData = extractTableData(table);
     const tableHeaders = extractTableHeaders(table);
 
-    // Define as colunas com base no array de cabeçalhos combinado
-    const columns = tableHeaders.map((header, index) => ({ dataKey: index, title: header }));
+    // Define as colunas com base no primeiro cabeçalho 
+    const columns = tableHeaders[0].map(headerObj => ({
+      header: headerObj.content,
+      dataKey: headerObj.content, // Usa o conteúdo do cabeçalho como dataKey
+      colSpan: headerObj.colspan // Define o colspan
+    }));
 
     doc.autoTable({
-      head: [tableHeaders], // Usa o array de cabeçalhos combinado diretamente
+      head: tableHeaders.map(headerRow => headerRow.map(headerObj => headerObj.content)), // Usa tableHeaders diretamente
       body: tableData,
       startY: startY,
       theme: 'grid',
