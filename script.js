@@ -24,6 +24,8 @@ function extractTableHeaders(table) {
   return headers;
 }
 
+// ... (outras funções) ...
+
 // Função para exportar para Excel (CORRIGIDA)
 function exportToExcel() {
   const wb = XLSX.utils.book_new();
@@ -43,22 +45,20 @@ function exportToExcel() {
 
   tables.forEach((table, tableIndex) => {
     const tableData = extractTableData(table);
-    const tableHeaders = extractTableHeaders(table);
 
-    // Adiciona os cabeçalhos da tabela (ambas as linhas)
-    tableHeaders.forEach((headerRow, rowIndex) => {
+    // Obtém o elemento <thead> da tabela
+    const tableHeader = table.querySelector('thead');
+
+    // Adiciona o cabeçalho da tabela ao Excel
+    const headerRows = tableHeader.querySelectorAll('tr');
+    headerRows.forEach(headerRow => {
       const rowData = [];
+      const headerCells = headerRow.querySelectorAll('th');
       let colIndex = 0;
-      headerRow.forEach(header => {
-        rowData[colIndex] = header;
-        // Adiciona os sub-cabeçalhos na linha seguinte
-        if (rowIndex === 0 && header.subHeaders.length > 0) {
-          header.subHeaders.forEach(subHeader => {
-            colIndex++;
-            rowData[colIndex] = subHeader;
-          });
-        }
-        colIndex += header.colspan;
+      headerCells.forEach(headerCell => {
+        const colspan = parseInt(headerCell.getAttribute('colspan')) || 1;
+        rowData[colIndex] = headerCell.textContent.trim();
+        colIndex += colspan;
       });
       XLSX.utils.sheet_add_aoa(ws, [rowData], { origin: { r: currentRow, c: 0 } });
       currentRow++;
@@ -66,9 +66,8 @@ function exportToExcel() {
 
     // Adiciona os dados da tabela com formatação de negrito
     tableData.forEach(rowData => {
-      const formattedRowData = rowData.map(cellData => {
-        // Verifica se a célula possui a tag <strong> usando expressão regular
-        if (cellData.match(/<strong>/)) {
+      const formattedRowData = rowData.map((cellData, cellIndex) => {
+        if (cellData.includes('<strong>')) {
           const cellValue = cellData.replace(/<strong>/g, '').replace(/<\/strong>/g, '');
           return { v: cellValue, s: { font: { bold: true } } };
         } else {
@@ -79,7 +78,7 @@ function exportToExcel() {
       currentRow++;
     });
 
-    currentRow += 2; 
+    currentRow += 2;
   });
 
   XLSX.utils.book_append_sheet(wb, ws, 'RelatorioCompleto');
@@ -87,7 +86,9 @@ function exportToExcel() {
   const excelFile = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
   const blob = new Blob([excelFile], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
   saveAs(blob, 'RelatorioCompleto.xlsx');
-}// Função para exportar para PDF (CORRIGIDA)
+}
+
+// Função para exportar para PDF (CORRIGIDA)
 function exportToPDF() {
   // Obtém a orientação da página dos botões checkbox
   const retratoCheckbox = document.getElementById('retratoPDF');
