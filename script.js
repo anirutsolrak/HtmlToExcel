@@ -167,7 +167,7 @@ function exportToPDF() {
       const headerRow2 = tableHeaders[1]; // Subtítulos
 
       doc.autoTable({
-        head: [headerRow1, headerRow2], // Passa as duas linhas separadamente
+         head: [headerRow1, headerRow2 ? headerRow2 : []], // Passa as duas linhas separadamente
         body: tableData,
         startY: startY,
         theme: 'grid',
