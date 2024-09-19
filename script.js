@@ -4,7 +4,8 @@ function extractTableData(table) {
   for (const row of table.querySelectorAll('tbody tr')) {
     const rowData = [];
     for (const cell of row.querySelectorAll('td')) {
-      rowData.push(cell.innerHTML.trim());
+      // Extrai apenas o texto da célula, sem as tags HTML
+      rowData.push(cell.textContent.trim()); 
     }
     tableData.push(rowData);
   }
