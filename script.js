@@ -3,7 +3,7 @@
 // <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 // <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
-// Funções auxiliares para extrair dados da tabela
+// Funções auxiliares para extrair dados da tabela (CORRIGIDAS)
 function extractTableData(table) {
   const tableData = [];
   for (const row of table.querySelectorAll('tbody tr')) {
@@ -18,13 +18,20 @@ function extractTableData(table) {
 
 function extractTableHeaders(table) {
   const headers = [];
-  for (const headerCell of table.querySelectorAll('thead th')) {
-    headers.push(headerCell.textContent.trim());
+  const headerRows = table.querySelectorAll('thead tr'); 
+
+  for (const row of headerRows) {
+    const rowData = [];
+    for (const cell of row.querySelectorAll('th')) {
+      rowData.push(cell.textContent.trim());
+    }
+    headers.push(rowData); 
   }
-  return headers;
+
+  return headers[0].map((header, i) => header + (headers[1][i] ? ' / ' + headers[1][i] : ''));
 }
 
-// Função para exportar para Excel
+// Função para exportar para Excel (CORRIGIDA)
 function exportToExcel() {
   const wb = XLSX.utils.book_new();
   const ws = XLSX.utils.aoa_to_sheet([]);
@@ -51,7 +58,7 @@ function exportToExcel() {
       columnsToUse = [0, 1, 2]; // Colunas para tabelas de detalhes
     }
 
-    // Adiciona os cabeçalhos da tabela
+    // Adiciona os cabeçalhos da tabela em duas linhas separadas
     XLSX.utils.sheet_add_aoa(ws, [tableHeaders.slice(0, columnsToUse.length)], { origin: { r: currentRow, c: 0 } });
     currentRow++;
 
@@ -79,7 +86,7 @@ function exportToExcel() {
   saveAs(blob, 'RelatorioCompleto.xlsx');
 }
 
-// Função para exportar para PDF
+// Função para exportar para PDF (CORRIGIDA)
 function exportToPDF() {
   // Obtém a orientação da página dos botões checkbox
   const retratoCheckbox = document.getElementById('retratoPDF');
@@ -129,97 +136,95 @@ function exportToPDF() {
   const logoX = titleX + doc.getTextDimensions(mainTitle, { maxWidth: maxTitleWidth }).w / 2 + 5;
   const logoY = titleY - titleHeight / 2 - logoHeight / 2;
 
-
   // Seleciona todas as tabelas de dados
-    const dataTables = document.querySelectorAll('.table.table-responsive.table-striped.table-bordered.table-sm');
+  const dataTables = document.querySelectorAll('.table.table-responsive.table-striped.table-bordered.table-sm');
 
-    // Renderiza o título, subtítulo e logo na primeira página
-    doc.setFontSize(16);
-    doc.text(mainTitle, titleX, titleY, { align: 'center', maxWidth: maxTitleWidth });
-    doc.setFontSize(14);
-    doc.text(subtitle, titleX, titleY + 8, { align: 'center' });
-    doc.addImage(logoImg, 'PNG', logoX, logoY, logoWidth, logoHeight);
+  // Renderiza o título, subtítulo e logo na primeira página
+  doc.setFontSize(16);
+  doc.text(mainTitle, titleX, titleY, { align: 'center', maxWidth: maxTitleWidth });
+  doc.setFontSize(14);
+  doc.text(subtitle, titleX, titleY + 8, { align: 'center' });
+  doc.addImage(logoImg, 'PNG', logoX, logoY, logoWidth, logoHeight);
 
-    // Define a posição inicial Y para a primeira tabela (considerando o título e a logo)
-    let startY = titleY + 30;
+  // Define a posição inicial Y para a primeira tabela (considerando o título e a logo)
+  let startY = titleY + 30;
 
-    dataTables.forEach((table) => {
-      const tableData = extractTableData(table);
-      const tableHeaders = extractTableHeaders(table);
+  dataTables.forEach((table) => {
+    const tableData = extractTableData(table);
+    const tableHeaders = extractTableHeaders(table);
 
-      // Obtém o número de colunas dinamicamente
-      const numColumns = table.querySelectorAll('thead tr:first-child th').length;
-      const columnsToUse = Array.from({ length: numColumns }, (_, i) => i);
+    // Define as colunas com base no array de cabeçalhos combinado
+    const columns = tableHeaders.map((header, index) => ({ dataKey: index, title: header }));
 
-      doc.autoTable({
-        head: [tableHeaders],
-        body: tableData,
-        startY: startY,
-        theme: 'grid',
-        useHTML: true,
-        pageBreak: 'avoid',
-        headStyles: {
-          fillColor: [200, 230, 255],
-          textColor: [0, 0, 0],
-        },
-        bodyStyles: {
-          fillColor: false,
-        },
-        alternateRowStyles: {
-          fillColor: false,
-        },
-        rowPageBreak: 'noWrap',
-        overFlow: 'linebreak',
-        showHead: 'everyPage',
-        styles: {
-          fontSize: 7,
-          fontStyle: 'normal',
-          fontFamily: 'Calibri, sans-serif',
-        },
-        columns: columnsToUse.map(index => ({ dataKey: index })),
-        didDrawPage: function (data) {
-          if (data.pageNumber > 1) {
-            doc.setFontSize(10);
-            doc.text("HOSPITAL REGIONAL DA COSTA LESTE MAGID THOMÉ", 10, 10);
-            doc.text("RL06 - CUSTO SERVIÇOS AUXILIARES", 10, 18);
-          }
-        },
-        didParseCell: function (data) {
-          if (data.row.index === 0 && data.section === 'body') {
-            data.cell.styles.fillColor = [200, 230, 255];
-            data.cell.styles.textColor = [0, 0, 0];
-          }
-          if (data.section === 'body' && data.column.index === 0) {
-            data.cell.styles.halign = 'left';
-          }
-          if (data.section === 'body' && data.column.index !== 0) {
-            data.cell.styles.halign = 'center';
-          }
-          if (data.cell.raw && data.cell.raw.includes('<strong>')) {
-            data.cell.styles.fontStyle = 'bold';
-            data.cell.text = data.cell.raw.replace(/<strong>/g, '').replace(/<\/strong>/g, '');
-          }
-        },
-        didDrawHeader: function (data) {
-          let titleHeight = doc.getTextDimensions(mainTitle, { maxWidth: maxTitleWidth }).h;
-          let titleX = doc.internal.pageSize.width / 2;
-          let titleY = data.settings.startY - titleHeight - 10;
-
-          doc.setFontSize(16);
-          doc.text(mainTitle, titleX, titleY, { align: 'center', maxWidth: maxTitleWidth });
-          doc.setFontSize(14);
-          doc.text(subtitle, titleX, titleY + 8, { align: 'center' });
-          doc.addImage(logoImg, 'PNG', logoX, logoY, logoWidth, logoHeight);
+    doc.autoTable({
+      head: [tableHeaders], // Usa o array de cabeçalhos combinado diretamente
+      body: tableData,
+      startY: startY,
+      theme: 'grid',
+      useHTML: true,
+      pageBreak: 'avoid',
+      headStyles: {
+        fillColor: [200, 230, 255],
+        textColor: [0, 0, 0],
+      },
+      bodyStyles: {
+        fillColor: false,
+      },
+      alternateRowStyles: {
+        fillColor: false,
+      },
+      rowPageBreak: 'noWrap',
+      overFlow: 'linebreak',
+      showHead: 'everyPage',
+      styles: {
+        fontSize: 7,
+        fontStyle: 'normal',
+        fontFamily: 'Calibri, sans-serif',
+      },
+      columns: columns, // Define as colunas com base no array de cabeçalhos combinado
+      didDrawPage: function (data) {
+        if (data.pageNumber > 1) {
+          doc.setFontSize(10);
+          doc.text("HOSPITAL REGIONAL DA COSTA LESTE MAGID THOMÉ", 10, 10);
+          doc.text("RL06 - CUSTO SERVIÇOS AUXILIARES", 10, 18);
         }
-      });
+      },
+      didParseCell: function (data) {
+        if (data.row.index === 0 && data.section === 'body') {
+          data.cell.styles.fillColor = [200, 230, 255];
+          data.cell.styles.textColor = [0, 0, 0];
+        }
+        if (data.section === 'body' && data.column.index === 0) {
+          data.cell.styles.halign = 'left';
+        }
+        if (data.section === 'body' && data.column.index !== 0) {
+          data.cell.styles.halign = 'center';
+        }
+        if (data.cell.raw && data.cell.raw.includes('<strong>')) {
+          data.cell.styles.fontStyle = 'bold';
+          data.cell.text = data.cell.raw.replace(/<strong>/g, '').replace(/<\/strong>/g, '');
+        }
+      },
+      didDrawHeader: function (data) {
+        let titleHeight = doc.getTextDimensions(mainTitle, { maxWidth: maxTitleWidth }).h;
+        let titleX = doc.internal.pageSize.width / 2;
+        let titleY = data.settings.startY - titleHeight - 10;
 
-      startY = doc.lastAutoTable.finalY + 10;
+        doc.setFontSize(16);
+        doc.text(mainTitle, titleX, titleY, { align: 'center', maxWidth: maxTitleWidth });
+        doc.setFontSize(14);
+        doc.text(subtitle, titleX, titleY + 8, { align: 'center' });
+        doc.addImage(logoImg, 'PNG', logoX, logoY, logoWidth, logoHeight);
+      }
     });
 
-    addDynamicTextAndPageNumbers(doc);
+    startY = doc.lastAutoTable.finalY + 10;
+  });
 
-    doc.save(document.querySelector('h3').textContent + '.pdf');
-  };
+  addDynamicTextAndPageNumbers(doc);
+
+  doc.save(document.querySelector('h3').textContent + '.pdf');
+}
 
 function addDynamicTextAndPageNumbers(doc) {
   const pageCount = doc.internal.getNumberOfPages();
@@ -235,7 +240,6 @@ function addDynamicTextAndPageNumbers(doc) {
     });
   }
 }
-
 
 // Manipuladores de eventos para os botões e checkboxes
 document.addEventListener('DOMContentLoaded', function() {
