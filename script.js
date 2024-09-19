@@ -157,15 +157,16 @@ function exportToPDF() {
     const tableHeaders = extractTableHeaders(table);
 
     // Cria o cabeçalho da tabela usando HTML
-    let tableHeaderHTML = '<thead>';
-    tableHeaders.forEach(headerRow => {
-      tableHeaderHTML += '<tr>';
-      headerRow.forEach(headerCell => {
-        tableHeaderHTML += `<th colspan="${cell.colSpan || 1}">${headerCell}</th>`;
-      });
-      tableHeaderHTML += '</tr>';
+     let tableHeaderHTML = '<thead>';
+  tableHeaders.forEach((headerRow, rowIndex) => { // Adiciona rowIndex para acessar a linha correta
+    tableHeaderHTML += '<tr>';
+    const headerCells = table.querySelectorAll(`thead tr:nth-child(${rowIndex + 1}) th`); // Seleciona as células <th> da linha atual
+    Array.from(headerCells).forEach(headerCell => { // Itera pelas células <th>
+      tableHeaderHTML += `<th colspan="${headerCell.colSpan || 1}">${headerCell.textContent.trim()}</th>`; 
     });
-    tableHeaderHTML += '</thead>';
+    tableHeaderHTML += '</tr>';
+  });
+  tableHeaderHTML += '</thead>';
 
     // Cria uma nova tabela HTML com o cabeçalho e os dados
     const tableHTML = `<table>${tableHeaderHTML}<tbody>${table.querySelector('tbody').innerHTML}</tbody></table>`;
