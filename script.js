@@ -18,19 +18,33 @@ function extractTableData(table) {
 
 function extractTableHeaders(table) {
   const headers = [];
-  const headerRows = table.querySelectorAll('thead tr'); 
+  const headerRows = table.querySelectorAll('thead tr');
 
-  for (const row of headerRows) {
-    const rowData = [];
-    for (const cell of row.querySelectorAll('th')) {
-      rowData.push(cell.textContent.trim());
+  // Obtem os cabeçalhos da primeira linha
+  const firstRowHeaders = Array.from(headerRows[0].querySelectorAll('th'))
+    .map(cell => cell.textContent.trim());
+
+  // Se houver mais de uma linha de cabeçalho, combina com a primeira
+  if (headerRows.length > 1) {
+    Array.from(headerRows[1].querySelectorAll('th'))
+      .map((cell, index) => {
+        // Combina os cabeçalhos em pares de duas colunas
+        if (index % 2 === 0) {
+          headers.push([firstRowHeaders[index], cell.textContent.trim()]); 
+        } else {
+          headers[headers.length - 1].push(cell.textContent.trim());
+        }
+      });
+  } else {
+    // Se houver apenas uma linha de cabeçalho, agrupa em pares
+    for (let i = 0; i < firstRowHeaders.length; i += 2) {
+      headers.push([firstRowHeaders[i], firstRowHeaders[i + 1] || '']);
     }
-    headers.push(rowData); 
   }
 
-  // Verifica se headers[1] existe antes de acessar o índice 0
-  return headers[0].map((header, i) => header + (headers[1] && headers[1][i] ? ' / ' + headers[1][i] : ''));
+  return headers;
 }
+
 // Função para exportar para Excel (CORRIGIDA)
 function exportToExcel() {
   const wb = XLSX.utils.book_new();
