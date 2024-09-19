@@ -161,7 +161,7 @@ function exportToPDF() {
     tableHeaders.forEach(headerRow => {
       tableHeaderHTML += '<tr>';
       headerRow.forEach(headerCell => {
-        tableHeaderHTML += `<th colspan="${headercell.colSpan || 1}">${headerCell}</th>`;
+        tableHeaderHTML += `<th colspan="${cell.colSpan || 1}">${headerCell}</th>`;
       });
       tableHeaderHTML += '</tr>';
     });
