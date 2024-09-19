@@ -16,20 +16,11 @@ function extractTableData(table) {
   return tableData;
 }
 
-// Função para extrair os cabeçalhos da tabela (CORRIGIDA)
 function extractTableHeaders(table) {
-  const headers = []; // Array para armazenar as linhas do cabeçalho
-  const headerRows = table.querySelectorAll('thead tr');
-
-  // Itera pelas linhas do cabeçalho
-  for (const row of headerRows) {
-    const rowHeaders = []; // Array para armazenar os cabeçalhos da linha atual
-    for (const headerCell of row.querySelectorAll('th')) {
-      rowHeaders.push(headerCell.textContent.trim());
-    }
-    headers.push(rowHeaders); // Adiciona o array de cabeçalhos da linha ao array principal
+  const headers = [];
+  for (const headerCell of table.querySelectorAll('thead th')) {
+    headers.push(headerCell.textContent.trim());
   }
-
   return headers;
 }
 
@@ -88,7 +79,7 @@ function exportToExcel() {
   saveAs(blob, 'RelatorioCompleto.xlsx');
 }
 
-// Função para exportar para PDF
+// Função para exportar para PDF (CORRIGIDA)
 function exportToPDF() {
   // Obtém a orientação da página dos botões checkbox
   const retratoCheckbox = document.getElementById('retratoPDF');
@@ -138,35 +129,35 @@ function exportToPDF() {
   const logoX = titleX + doc.getTextDimensions(mainTitle, { maxWidth: maxTitleWidth }).w / 2 + 5;
   const logoY = titleY - titleHeight / 2 - logoHeight / 2;
 
-
   // Seleciona todas as tabelas de dados
-    const dataTables = document.querySelectorAll('.table.table-responsive.table-striped.table-bordered.table-sm');
+  const dataTables = document.querySelectorAll('.table.table-responsive.table-striped.table-bordered.table-sm');
 
-    // Renderiza o título, subtítulo e logo na primeira página
-    doc.setFontSize(16);
-    doc.text(mainTitle, titleX, titleY, { align: 'center', maxWidth: maxTitleWidth });
-    doc.setFontSize(14);
-    doc.text(subtitle, titleX, titleY + 8, { align: 'center' });
-    doc.addImage(logoImg, 'PNG', logoX, logoY, logoWidth, logoHeight);
+  // Renderiza o título, subtítulo e logo na primeira página
+  doc.setFontSize(16);
+  doc.text(mainTitle, titleX, titleY, { align: 'center', maxWidth: maxTitleWidth });
+  doc.setFontSize(14);
+  doc.text(subtitle, titleX, titleY + 8, { align: 'center' });
+  doc.addImage(logoImg, 'PNG', logoX, logoY, logoWidth, logoHeight);
 
-    // Define a posição inicial Y para a primeira tabela (considerando o título e a logo)
-    let startY = titleY + 30;
+  // Define a posição inicial Y para a primeira tabela (considerando o título e a logo)
+  let startY = titleY + 30;
 
-     dataTables.forEach((table) => {
+  dataTables.forEach((table) => {
     const tableData = extractTableData(table);
     const tableHeaders = extractTableHeaders(table);
 
-   // Obtém o elemento <thead> da tabela
-  const tableHeader = table.querySelector('thead');
+    // Obtém o elemento <thead> da tabela
+    const tableHeader = table.querySelector('thead');
 
-  // Cria uma nova tabela HTML com o cabeçalho e os dados
-  const tableHTML = `<table>${tableHeader.outerHTML}<tbody>${table.querySelector('tbody').innerHTML}</tbody></table>`;
+    // Cria uma nova tabela HTML com o cabeçalho e os dados
+    const tableHTML = `<table>${tableHeader.outerHTML}<tbody>${table.querySelector('tbody').innerHTML}</tbody></table>`;
 
-  // Converte a string tableHTML em um elemento HTML
-  const parser = new DOMParser();
-  const tableElement = parser.parseFromString(tableHTML, 'text/html').querySelector('table');
+    // Converte a string tableHTML em um elemento HTML
+    const parser = new DOMParser();
+    const tableElement = parser.parseFromString(tableHTML, 'text/html').querySelector('table');
+
     doc.autoTable({
-      html: tableHTML, // Usa a tabela HTML completa
+      html: tableElement, // Usa o elemento HTML da tabela
       startY: startY,
       theme: 'grid',
       useHTML: true, // Ativa a renderização de HTML
@@ -228,10 +219,10 @@ function exportToPDF() {
     startY = doc.lastAutoTable.finalY + 10;
   });
 
-    addDynamicTextAndPageNumbers(doc);
+  addDynamicTextAndPageNumbers(doc);
 
-    doc.save(document.querySelector('h3').textContent + '.pdf');
-  };
+  doc.save(document.querySelector('h3').textContent + '.pdf');
+}
 
 function addDynamicTextAndPageNumbers(doc) {
   const pageCount = doc.internal.getNumberOfPages();
