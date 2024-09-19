@@ -198,10 +198,6 @@ function exportToPDF() {
       if (data.section === 'body' && data.column.index !== 0) {
         data.cell.styles.halign = 'center';
       }
-      if (data.cell.raw && data.cell.raw.includes('<strong>')) {
-        data.cell.styles.fontStyle = 'bold';
-        data.cell.text = data.cell.raw.replace(/<strong>/g, '').replace(/<\/strong>/g, '');
-      }
     },
     didDrawHeader: function (data) {
       let titleHeight = doc.getTextDimensions(mainTitle, { maxWidth: maxTitleWidth }).h;
