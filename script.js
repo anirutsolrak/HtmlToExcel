@@ -179,12 +179,12 @@ function exportToPDF() {
     },
     bodyStyles: {
       fillColor: false,
-       lineWidth: 0.5, 
-      lineColor: [255, 255, 255],
+    /*   lineWidth: 0.5, 
+     lineColor: [255, 255, 255],
       top: 0, 
       right: 0.5,
       bottom: 0.5,
-      left: 0.5
+      left: 0.5 */
     },
     alternateRowStyles: {
       fillColor: false,
