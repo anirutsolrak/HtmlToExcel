@@ -176,12 +176,12 @@ function exportToPDF() {
       textColor: [0, 0, 0],
       halign: 'center', // Centraliza os cabeçalhos
        lineWidth: 1, 
-      lineColor: [192, 192, 192] // Preto
+      lineColor: [200, 200, 200] // Preto
     },
     bodyStyles: {
       fillColor: false,
        lineWidth: 1, 
-      lineColor: [192, 192, 192],
+      lineColor: [200, 200, 200],
       top: 0, 
       right: 1,
       bottom: 1,
