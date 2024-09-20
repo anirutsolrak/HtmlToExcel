@@ -24,7 +24,6 @@ function extractTableHeaders(table) {
   return headers;
 }
 
-// ... (outras funções) ...
 
 // Função para exportar para Excel (CORRIGIDA)
 function exportToExcel() {
@@ -175,17 +174,17 @@ function exportToPDF() {
       fillColor: [200, 230, 255],
       textColor: [0, 0, 0],
       halign: 'center', // Centraliza os cabeçalhos
-       lineWidth: 1, 
-      lineColor: [200, 200, 200] // Preto
+       lineWidth: 0.5, 
+      lineColor: [255, 255, 255] // Preto
     },
     bodyStyles: {
       fillColor: false,
-       lineWidth: 1, 
-      lineColor: [200, 200, 200],
+       lineWidth: 0.5, 
+      lineColor: [255, 255, 255],
       top: 0, 
-      right: 1,
-      bottom: 1,
-      left: 1
+      right: 0.5,
+      bottom: 0.5,
+      left: 0.5
     },
     alternateRowStyles: {
       fillColor: false,
