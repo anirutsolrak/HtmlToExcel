@@ -180,6 +180,12 @@ function exportToPDF() {
     },
     bodyStyles: {
       fillColor: false,
+       lineWidth: 1, 
+      lineColor: [192, 192, 192],
+      top: 0, 
+      right: 1,
+      bottom: 1,
+      left: 1
     },
     alternateRowStyles: {
       fillColor: false,
