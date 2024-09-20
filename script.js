@@ -174,7 +174,9 @@ function exportToPDF() {
     headStyles: {
       fillColor: [200, 230, 255],
       textColor: [0, 0, 0],
-      halign: 'center' // Centraliza os cabeçalhos
+      halign: 'center', // Centraliza os cabeçalhos
+       lineWidth: 1, 
+      lineColor: [0, 0, 0] // Preto
     },
     bodyStyles: {
       fillColor: false,
