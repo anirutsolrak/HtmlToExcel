@@ -52,10 +52,18 @@ function exportToExcel() {
   XLSX.writeFile(wb, 'Relatorio.xlsx');
 }
 
-// Função para exportar para PDF (CORRIGIDA)
-function exportToPDF() {
+
+// Define a orientação com base nos checkboxes
+  let orientation = 'portrait'; // Valor padrão
+  if (retratoCheckbox.checked) {
+    orientation = 'portrait';
+  } else if (paisagemCheckbox.checked) {
+    orientation = 'landscape';
+  }
+
+  const { jsPDF } = window.jspdf;
   const doc = new jsPDF({
-    orientation: document.getElementById('retratoPDF').checked ? 'portrait' : 'landscape',
+    orientation: orientation
   });
 
   const newLineHeightFactor = 0.4;
