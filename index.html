@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Custos Acqua</title>
@@ -8,448 +8,89 @@
     <script src="https://cjpnet.com.br/bootstrap/js/jquery.min.js"></script>
     <script src="https://cjpnet.com.br/bootstrap/js/bootstrap.min.js"></script>
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <!-- Bibliotecas para exportação -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script> 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script> 
 
     <style>	
-    .pri-table thead tr th {
-        background-color: #d3e0ea; /* Cor de fundo azul claro */
-    }
-    .det-table thead tr th {
-        background-color: #B0E0E6; /* Cor de fundo azul claro */
-    }  
-    /* Estilos para o modal */
-    #formatoModal .modal-dialog {
-      display: flex;
-      align-items: center; /* Centraliza verticalmente */
-      justify-content: center; /* Centraliza horizontalmente */
-      min-height: calc(100% - 3.5rem); /* Ajusta a altura mínima */
-    }
-
-    #formatoModal .modal-content {
-      border-radius: 10px; /* Cantos arredondados */
-      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2); /* Sombra */
-    }
-
-    #formatoModal .modal-header {
-      background-color: #f8f9fa; /* Cor de fundo do cabeçalho */
-      border-bottom: none; /* Remove a borda inferior */
-      border-top-left-radius: 10px; /* Cantos arredondados no topo */
-      border-top-right-radius: 10px;
-    }
-
-    #formatoModal .modal-title {
-      font-weight: 600; /* Título em negrito */
-    }
-
-    #formatoModal .btn-outline-primary {
-      border-radius: 5px; /* Cantos arredondados nos botões */
-    }
-
-    #formatoModal .form-check-input:checked {
-      background-color: #28a745;
-      border-color: #28a745;
-    }
-
-    #formatoModal .form-check-input:focus {
-      box-shadow: none;
-    }
-
-    #formatoModal .form-check-label {
-      margin-left: 10px;
-    }
-  </style>
+        .larg {
+            width: 20%;
+        }
+        .table-condensed {
+            font-size: 10px;
+        }
+        .pri-table thead tr th {
+            background-color: #d3e0ea; /* Cor de fundo azul claro */
+        }
+        .det-table thead tr th {
+            background-color: #B0E0E6; /* Cor de fundo azul claro */
+        }  
+    </style>
 </head>
 <body>
     <div class="container"> 
         <div class="row">
             <div class="col-sm-9">
                 <h2>HOSPITAL REGIONAL DA COSTA LESTE MAGID THOMÉ</h2>
-                <h3>RL06 - CUSTO SERVIÇOS AUXILIARES</h3>
+                <h3>RL01 - RELATÓRIO GERENCIAL</h3>
             </div>
-            <div class="col-sm-3"><img alt="Sistemas Integrados" src="logo.png"></div>
+            <div class="col-sm-3">
+                <img alt="Sistemas Integrados" src="logo.png"> 
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-9">
+                <p><strong>COMPETÊNCIA: </strong>2024-02</p>
+            </div>
         </div>
         <br>
 
-        <table class="table table-responsive table-striped table-bordered table-sm pri-table">
+        <table class="table table-responsive table-condensed table-striped pri-table">
             <thead>
                 <tr>
-                <th colspan="2">CME - CENTRAL DE MATERIAIS ESTERILIZADOS</th>
-                <th colspan="2">Quantidade de Itens Esterilizados x Peso</th>
-                </tr>
-                <tr>
-                <th>Meses</th><th>Custo Total</th><th>Quantidade</th><th>Custo Unitário</th>
+                    <th class="larg">CENTRO DE CUSTOS</th>
+                    <th>TOTAL (Diretos + Indiretos)</th>
+                    <th>TOTAL (Despesas)</th>
+                    <th>Rateios recebidos</th>
+                    <th>TOTAL CUSTOS</th>
+                    <th>Receita</th>
+                    <th>RESULTADO</th>
+                    <th>Quantidade Produzida</th>
+                    <th>Custo Unitário</th>
+                    <th>Receita Unitária</th>
+                    <th>Resultado Unitário</th>
+                    <th>Custo Fixo</th>
+                    <th>Custo Variável</th>
+                    <th>Margem de Contribuição</th>
+                    <th>Taxa Marginal de Contribuição</th>
+                    <th>Ponto de Equilíbrio</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td>Jan/24</td>
-                    <td>246.057,73</td>
-                    <td>3.353</td>
-                    <td>73,38</td>
-                </tr>
-                <tr>
-                    <td>Fev/24</td>
-                    <td>243.191,39</td>
-                    <td>3.687</td>
-                    <td>65,96</td>
-                </tr>
-                <tr>
-                    <td>Mar/24</td>
-                    <td>151.071,33</td>
-                    <td>1.890</td>
-                    <td>79,93</td>
-                </tr>
-                <tr>
-                    <td><strong>MÉDIA</strong></td>
-                    <td><strong>213.440,15</strong></td>
-                    <td><strong>630</strong></td>
-                    <td><strong>338,79</strong></td>
-                </tr>
-            </tbody>
-        </table>
-        <br>
-        <table class="table table-responsive table-striped table-bordered table-sm det-table">
-            <thead>
-                <tr class="table-success">
-                <th>Detalhe</th>
-                <th>Peso</th>
-                <th>Custo Unitário</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Kit Grande Porte</td>
-                    <td>7,00</td>
-                    <td>48,40</td>
-                </tr>
-                <tr>
-                    <td>Kit Médio Porte</td>
-                    <td>3,50</td>
-                    <td>96,80</td>
-                </tr>
-                <tr>
-                    <td>Kit Pequeno Porte</td>
-                    <td>1,00</td>
-                    <td>338,79</td>
-                </tr>
-            </tbody>
-        </table>
-        <br>
-        <table class="table table-responsive table-striped table-bordered table-sm pri-table">
-            <thead>
-                <tr>
-                <th colspan="2">ENGENHARIA CLÍNICA</th>
-                <th colspan="2">Horas Trabalhadas</th>
-                </tr>
-                <tr>
-                <th>Meses</th><th>Custo Total</th><th>Quantidade</th><th>Custo Unitário</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Jan/24</td>
-                    <td>131.089,06</td>
-                    <td>258</td>
-                    <td>508,10</td>
-                </tr>
-                <tr>
-                    <td>Fev/24</td>
-                    <td>131.392,28</td>
-                    <td>180</td>
-                    <td>729,96</td>
-                </tr>
-                <tr>
-                    <td><strong>MÉDIA</strong></td>
-                    <td><strong>131.240,67</strong></td>
-                    <td><strong>90</strong></td>
-                    <td><strong>1.458,23</strong></td>
-                </tr>
-            </tbody>
-        </table><br>
-        <table class="table table-responsive table-striped table-bordered table-sm pri-table">
-            <thead>
-                <tr>
-                <th colspan="2">LAVANDERIA E ROUPARIA</th>
-                <th colspan="2">Kg de Roupa Suja</th>
-                </tr>
-                <tr>
-                <th>Meses</th><th>Custo Total</th><th>Quantidade</th><th>Custo Unitário</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Jan/24</td>
-                    <td>92.985,55</td>
+                    <td>AMBULATÓRIO</td>
+                    <td>308.303,34</td>
                     <td>0</td>
-                    <td></td>
+                    <td>203.525,29</td>
+                    <td>511.828,63</td>
+                    <td>433.583,83</td>
+                    <td>-78.244,80</td>
+                    <td>761,00</td>
+                    <td>672,57</td>
+                    <td>569,76</td>
+                    <td>-102,81</td>
+                    <td>44.485,21</td>
+                    <td>263.818,13</td>
+                    <td>169.765,70</td>
+                    <td>39,00</td>
+                    <td>199,41</td>
                 </tr>
-                <tr>
-                    <td>Fev/24</td>
-                    <td>97.719,98</td>
-                    <td>0</td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>Mar/24</td>
-                    <td>114.227,26</td>
-                    <td>0</td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td><strong>MÉDIA</strong></td>
-                    <td><strong>101.644,26</strong></td>
-                    <td><strong>0</strong></td>
-                    <td><strong></strong></td>
-                </tr>
+                <!-- ... Outros dados da sua tabela aqui ... -->
             </tbody>
         </table>
-        <br>
-        <table class="table table-responsive table-striped table-bordered table-sm pri-table">
-            <thead>
-                <tr>
-                <th colspan="2">MANUTENÇÃO PREDIAL</th>
-                <th colspan="2">Horas Trabalhadas</th>
-                </tr>
-                <tr>
-                <th>Meses</th><th>Custo Total</th><th>Quantidade</th><th>Custo Unitário</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Jan/24</td>
-                    <td>200.376,68</td>
-                    <td>689</td>
-                    <td>290,82</td>
-                </tr>
-                <tr>
-                    <td>Fev/24</td>
-                    <td>374.251,89</td>
-                    <td>725</td>
-                    <td>516,21</td>
-                </tr>
-                <tr>
-                    <td><strong>MÉDIA</strong></td>
-                    <td><strong>287.314,29</strong></td>
-                    <td><strong>363</strong></td>
-                    <td><strong>792,59</strong></td>
-                </tr>
-            </tbody>
-        </table>
-        <br>
-        <table class="table table-responsive table-striped table-bordered table-sm pri-table">
-            <thead>
-                <tr>
-                <th colspan="2">SHL - SERVIÇO DE HIGIENE E LIMPEZA</th>
-                <th colspan="2">Área Metro Quadrado x Criticidade</th>
-                </tr>
-                <tr>
-                <th>Meses</th><th>Custo Total</th><th>Quantidade</th><th>Custo Unitário</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Jan/24</td>
-                    <td>417.750,83</td>
-                    <td>11.001</td>
-                    <td>37,97</td>
-                </tr>
-                <tr>
-                    <td>Fev/24</td>
-                    <td>416.266,72</td>
-                    <td>14.335</td>
-                    <td>29,04</td>
-                </tr>
-                <tr>
-                    <td>Mar/24</td>
-                    <td>420.733,59</td>
-                    <td>12.110</td>
-                    <td>34,74</td>
-                </tr>
-                <tr>
-                    <td><strong>MÉDIA</strong></td>
-                    <td><strong>418.250,38</strong></td>
-                    <td><strong>4.037</strong></td>
-                    <td><strong>103,61</strong></td>
-                </tr>
-            </tbody>
-        </table>
-        <br>
-        <table class="table table-responsive table-striped table-bordered table-sm det-table">
-            <thead>
-                <tr class="table-success">
-                <th>Detalhe</th>
-                <th>Peso</th>
-                <th>Custo Unitário</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>0-Área não Soma</td>
-                    <td>0</td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>A-Área Não Crítica</td>
-                    <td>1,00</td>
-                    <td>103,61</td>
-                </tr>
-                <tr>
-                    <td>B-Área Semi Crítica</td>
-                    <td>2,00</td>
-                    <td>51,81</td>
-                </tr>
-                <tr>
-                    <td>C-Área Crítica</td>
-                    <td>3,00</td>
-                    <td>34,54</td>
-                </tr>
-            </tbody>
-        </table>
-        <br>
-        <table class="table table-responsive table-striped table-bordered table-sm pri-table">
-            <thead>
-                <tr>
-                <th colspan="2">SND - SERVIÇO DE NUTRIÇÃO E DIETÉTICA</th>
-                <th colspan="2">Quantidade de Refeições x Peso</th>
-                </tr>
-                <tr>
-                <th>Meses</th><th>Custo Total</th><th>Quantidade</th><th>Custo Unitário</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Jan/24</td>
-                    <td>320.162,31</td>
-                    <td>15.698</td>
-                    <td>20,40</td>
-                </tr>
-                <tr>
-                    <td>Fev/24</td>
-                    <td>269.522,39</td>
-                    <td>13.736</td>
-                    <td>19,62</td>
-                </tr>
-                <tr>
-                    <td>Mar/24</td>
-                    <td>315.860,90</td>
-                    <td>17.548</td>
-                    <td>18,00</td>
-                </tr>
-                <tr>
-                    <td><strong>MÉDIA</strong></td>
-                    <td><strong>301.848,53</strong></td>
-                    <td><strong>5.849</strong></td>
-                    <td><strong>51,60</strong></td>
-                </tr>
-            </tbody>
-        </table>
-        <br>
-        <table class="table table-responsive table-striped table-bordered table-sm det-table">
-            <thead>
-                <tr class="table-success">
-                <th>Detalhe</th>
-                <th>Peso</th>
-                <th>Custo Unitário</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Almoço Colaborador (CLT+Terceiros)</td>
-                    <td>3,00</td>
-                    <td>17,20</td>
-                </tr>
-                <tr>
-                    <td>Almoço Colaborador (CLT+Terceiros)</td>
-                    <td>3,38</td>
-                    <td>15,27</td>
-                </tr>
-                <tr>
-                    <td>Almoço paciente/Acompanhante</td>
-                    <td>3,00</td>
-                    <td>17,20</td>
-                </tr>
-                <tr>
-                    <td>Almoço paciente/Acompanhante</td>
-                    <td>3,38</td>
-                    <td>15,27</td>
-                </tr>
-                <tr>
-                    <td>Ceia Colaborador (CLT+Terceiros)</td>
-                    <td>1,00</td>
-                    <td>51,60</td>
-                </tr>
-                <tr>
-                    <td>Ceia Colaborador (CLT+Terceiros)</td>
-                    <td>1,26</td>
-                    <td>40,96</td>
-                </tr>
-                <tr>
-                    <td>Ceia Paciente/Acompanhante</td>
-                    <td>1,00</td>
-                    <td>51,60</td>
-                </tr>
-                <tr>
-                    <td>Ceia Paciente/Acompanhante</td>
-                    <td>1,26</td>
-                    <td>40,96</td>
-                </tr>
-                <tr>
-                    <td>Desjejum Colaborador (CLT+Terceiros)</td>
-                    <td>1,00</td>
-                    <td>51,60</td>
-                </tr>
-                <tr>
-                    <td>Desjejum Colaborador (CLT+Terceiros)</td>
-                    <td>1,47</td>
-                    <td>35,10</td>
-                </tr>
-                <tr>
-                    <td>Desjejum Paciente/Acompanhante</td>
-                    <td>1,00</td>
-                    <td>51,60</td>
-                </tr>
-                <tr>
-                    <td>Desjejum Paciente/Acompanhante</td>
-                    <td>1,47</td>
-                    <td>35,10</td>
-                </tr>
-                <tr>
-                    <td>Jantar Colaborador (CLT+Terceiros)</td>
-                    <td>3,00</td>
-                    <td>17,20</td>
-                </tr>
-                <tr>
-                    <td>Jantar Colaborador (CLT+Terceiros)</td>
-                    <td>3,38</td>
-                    <td>15,27</td>
-                </tr>
-                <tr>
-                    <td>Jantar Paciente/Acompanhante</td>
-                    <td>3,00</td>
-                    <td>17,20</td>
-                </tr>
-                <tr>
-                    <td>Jantar Paciente/Acompanhante</td>
-                    <td>3,38</td>
-                    <td>15,27</td>
-                </tr>
-                <tr>
-                    <td>Lanche Tarde Colaborador (CLT+Terceiros)</td>
-                    <td>1,00</td>
-                    <td>51,60</td>
-                </tr>
-                <tr>
-                    <td>Lanche Tarde Paciente/acompanhante</td>
-                    <td>1,00</td>
-                    <td>51,60</td>
-                </tr>
-            </tbody>
-        </table>
-        <br>
-
+        <br/>
+        
         <button class="btn btn-outline-secondary" type="button" class="btn btn-info" onclick="history.back()">Voltar</button>
         <button class="float-right btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#formatoModal">Imprimir</button>
 
@@ -464,30 +105,27 @@
                     <div class="modal-body py-4 px-5">
                         <button id="btn-excel" class="btn btn-outline-primary btn-block mb-3">Excel</button>
                         <button id="btn-pdf" class="btn btn-outline-primary btn-block">PDF</button>
-
-                      <div class="form-check form-switch mt-3">
-                        <input class="form-check-input" type="checkbox" id="retratoPDF" checked>
-                        <label class="form-check-label" for="retratoPDF">Retrato</label>
-                      </div>
-                      <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="paisagemPDF">
-                        <label class="form-check-label" for="paisagemPDF">Paisagem</label>
-                      </div>
-
+                        <div class="form-check form-switch mt-3">
+                            <input class="form-check-input" type="checkbox" id="retratoPDF" checked>
+                            <label class="form-check-label" for="retratoPDF">Retrato</label>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="paisagemPDF">
+                            <label class="form-check-label" for="paisagemPDF">Paisagem</label>
+                        </div>
                     </div>
                     <div class="modal-footer">
-                      <button id="btn-fechar" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                        <button id="btn-fechar" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                     </div>
                 </div>
             </div>
         </div>
 
         <footer>
-            <p><strong><span style="font-size: 9pt; color: rgb(0, 102, 0);">Sistemas integrados  <a href="http://www.cjpnet.com.br/" target="_blank">www.cjpnet.com.br</a></strong>
+            <p><strong><span style="font-size: 9pt; color: rgb(0, 102, 0);">Sistemas integrados  <a href="http://www.cjpnet.com.br/" target="_blank">www.cjpnet.com.br</a></strong>
             </p>
         </footer>
     </div>
-
-    <script src="script.js"></script> 
+<script src="script.js"></script>
 </body>
 </html>
