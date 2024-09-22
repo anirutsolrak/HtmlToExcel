@@ -53,7 +53,13 @@ function exportToExcel() {
 }
 
 
-// Define a orientação com base nos checkboxes
+// Função para exportar para PDF (CORRIGIDA)
+function exportToPDF() {
+  // Obtém a orientação da página dos botões checkbox
+  const retratoCheckbox = document.getElementById('retratoPDF');
+  const paisagemCheckbox = document.getElementById('paisagemPDF');
+
+  // Define a orientação com base nos checkboxes
   let orientation = 'portrait'; // Valor padrão
   if (retratoCheckbox.checked) {
     orientation = 'portrait';
